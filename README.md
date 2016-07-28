@@ -3,14 +3,15 @@ Temporal Segment Networks (TSN)
 
 This repository holds the codes and models for the paper
  
-**Temporal Segment Networks: Towards Good Practices for Deep Action Recognition** 
+**Temporal Segment Networks: Towards Good Practices for Deep Action Recognition**,
 Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool,
-ECCV 2016, Amsterdam, Netherland.
+*ECCV 2016*, Amsterdam, Netherland.
 
 It can be used for general video-based action recognition tasks. 
 
 Below is the step-by-step guide to reproduce the reported results.
 
+#Usage Guide
 
 ## Prerequisites
 
@@ -25,7 +26,7 @@ Besides software, GPU(s) are highly recommended for training. Our Caffe modifica
 
 ## Code & Data Preparation
 
-#### Get the code
+### Get the code
 Use git to clone this repository and its submodules
 ```
 git clone --recursive https://github.com/yjxiong/temporal-segment-networks
@@ -38,15 +39,40 @@ bash build-all.sh
 ```
 It will build Caffe and dense_flow. Since we need OpenCV to have Video IO, which is absent in most default installations, it will also download and build a local installation of OpenCV and use its Python interfaces. 
 
-#### Prepare videos
+### Get the videos
 We experimented on two mainstream action recognition dataset: [UCF-101][ucf101] and [HMDB51][hmdb51]. Videos can be downloaded directly from their websites.
 After download, please extract the videos from the `rar` archives.
+- UCF101: the ucf101 videos are archived in the downloaded file. Please use `unrar x UCF-101.rar` to extract the videos.
+- HMDB51: the HMDB51 video archive has two-level of packaging. The following commands illustrate to extract the videos inside.
+```
+mkdir rars && mkdir videos
+unrar x hmdb51-org.rar rars/
+for a in $(ls rars) do; unrar x $a videos/; done;
+```
+
+## Extract Frames and Optical Flow Images
+
+To run the training and testing, we need to decompose the video into frames. Also the temporal stream networks needs optical flow or warped optical flow images for input.
+ 
+These can be achieved with the script `scripts/extract_optical_flow.sh`. The script has three arguments: `SRC_FOLDER` which points to the place where you extract the 
 
 ## Testing Provided Models
 
 ## Training Temporal Segment Networks
 
+#Others
 
+## Citation
+Please cite the following paper if you feel this repository useful.
+
+## Related Projects
+
+## Contact
+For any question, please contact
+```
+Yuanjun Xiong: xy012@ie.cuhk.edu.hk
+Limin Wang: lmwang.nju@gmail.com
+```
 
 [ucf101]:http://crcv.ucf.edu/data/UCF101.php
 [hmdb51]:http://serre-lab.clps.brown.edu/resource/hmdb-a-large-human-motion-database/
