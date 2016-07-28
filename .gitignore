@@ -1,3 +1,10 @@
+# local files
+local/
+logs/
+
+# IDEA project configs
+.idea/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
