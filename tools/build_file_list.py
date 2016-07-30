@@ -86,7 +86,7 @@ def build_split_list(split_tuple, frame_info, split_idx):
 ## Dataset specific split file parse
 def parse_ucf_splits():
     class_ind = [x.strip().split() for x in open('data/ucf101_splits/classInd.txt')]
-    class_mapping = {x[1]:x[0] for x in class_ind}
+    class_mapping = {x[1]:int(x[0])-1 for x in class_ind}
 
     def line2rec(line):
         items = line.strip().split('/')
