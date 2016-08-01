@@ -2,7 +2,7 @@
 This module provides some utils for calculating metrics
 """
 import numpy as np
-from sklearn.metrics import average_precision_score
+from sklearn.metrics import average_precision_score, confusion_matrix
 
 
 def softmax(raw_score, T=1):
@@ -48,3 +48,13 @@ def video_mean_ap(score_dict, video_list):
         gt_array[i, list(avail_video_labels[i])] = 1
     mean_ap = average_precision_score(gt_array, pred_array, average='macro')
     return mean_ap
+
+
+def mean_class_accuracy(scores, labels):
+    pred = np.argmax(scores, axis=1)
+    cf = confusion_matrix(labels, pred).astype(float)
+
+    cls_cnt = cf.sum(axis=1)
+    cls_hit = np.diag(cf)
+
+    return np.mean(cls_hit/cls_cnt)

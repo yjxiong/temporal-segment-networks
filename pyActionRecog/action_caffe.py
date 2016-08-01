@@ -54,12 +54,15 @@ class CaffeNet(object):
         out = self._net.forward(blobs=[score_name,], data=data)
         return out[score_name].copy()
 
-    def predict_single_flow_stack(self, frame, score_name, over_sample=True):
+    def predict_single_flow_stack(self, frame, score_name, over_sample=True, frame_size=None):
+
+        if frame_size is not None:
+            frame = np.array([cv2.resize(x, frame_size) for x in frame])
 
         if over_sample:
             os_frame = flow_stack_oversample(frame, (self._sample_shape[2], self._sample_shape[3]))
         else:
-            os_frame = np.array([frame,])
+            os_frame = np.array([frame])
 
         data = os_frame - 128
 

@@ -41,6 +41,8 @@ f_info = parse_directory(args.frame_path,
 
 eval_video_list = split_tp[args.split - 1][1]
 
+score_name = 'fc-action'
+
 
 def build_net():
     global net
@@ -55,24 +57,31 @@ def eval_video(video):
 
     video_frame_path = f_info[0][vid]
     frame_cnt = f_info[1][vid]
-    frame_ticks = range(1, frame_cnt+1, int(math.floor(frame_cnt / args.num_frame_per_video)))
+
+    stack_depth = 0
+    if args.modality == 'rgb':
+        stack_depth = 1
+    elif args.modality == 'flow':
+        stack_depth = 5
+
+    frame_ticks = range(1, frame_cnt+1, (frame_cnt - stack_depth + 1) / args.num_frame_per_video)
 
     frame_scores = []
     for tick in frame_ticks:
         if args.modality == 'rgb':
             name = '{}{:05d}.jpg'.format(args.rgb_prefix, tick)
             frame = cv2.imread(os.path.join(video_frame_path, name), cv2.IMREAD_COLOR)
-            scores = net.predict_single_frame([frame,], 'fc-action')
+            scores = net.predict_single_frame([frame,], score_name, frame_size=(340, 256))
             frame_scores.append(scores)
         if args.modality == 'flow':
-            frame_idx = [min(frame_cnt, tick+offset) for offset in xrange(5)]
+            frame_idx = [min(frame_cnt, tick+offset) for offset in xrange(stack_depth)]
             flow_stack = []
             for idx in frame_idx:
                 x_name = '{}{:05d}.jpg'.format(args.flow_x_prefix, idx)
                 y_name = '{}{:05d}.jpg'.format(args.flow_y_prefix, idx)
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, x_name), cv2.IMREAD_GRAYSCALE))
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, y_name), cv2.IMREAD_GRAYSCALE))
-            scores = net.predict_single_flow_stack(np.array(flow_stack), 'fc-action')
+            scores = net.predict_single_flow_stack(np.array(flow_stack), score_name, frame_size=(340, 256))
             frame_scores.append(scores)
 
     print 'video {} done'.format(vid)
