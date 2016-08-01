@@ -23,11 +23,12 @@ parser.add_argument('frame_path', type=str, help="root directory holding the fra
 parser.add_argument('net_proto', type=str)
 parser.add_argument('net_weights', type=str)
 parser.add_argument('--rgb_prefix', type=str, help="prefix of RGB frames", default='img_')
-parser.add_argument('--flow_x_prefix', type=str, help="prefix of x direction flow images", default='flow_x')
-parser.add_argument('--flow_y_prefix', type=str, help="prefix of y direction flow images", default='flow_y')
+parser.add_argument('--flow_x_prefix', type=str, help="prefix of x direction flow images", default='flow_x_')
+parser.add_argument('--flow_y_prefix', type=str, help="prefix of y direction flow images", default='flow_y_')
 parser.add_argument('--num_frame_per_video', type=int, default=25,
                     help="prefix of y direction flow images")
 parser.add_argument('--save_scores', type=str, default=None, help='the filename to save the scores in')
+parser.add_argument('--num_worker', type=int, default=1)
 args = parser.parse_args()
 
 
@@ -43,7 +44,7 @@ eval_video_list = split_tp[args.split - 1][1]
 
 def build_net():
     global net
-    my_id = multiprocessing.current_process()._identity[0]
+    my_id = multiprocessing.current_process()._identity[0] if args.num_worker > 1 else 1
     net = CaffeNet(args.net_proto, args.net_weights, my_id-1)
 
 
@@ -64,25 +65,26 @@ def eval_video(video):
             scores = net.predict_single_frame([frame,], 'fc-action')
             frame_scores.append(scores)
         if args.modality == 'flow':
-            frame_idx = [max(frame_cnt, tick+offset) for offset in xrange(5)]
+            frame_idx = [min(frame_cnt, tick+offset) for offset in xrange(5)]
             flow_stack = []
             for idx in frame_idx:
                 x_name = '{}{:05d}.jpg'.format(args.flow_x_prefix, idx)
                 y_name = '{}{:05d}.jpg'.format(args.flow_y_prefix, idx)
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, x_name), cv2.IMREAD_GRAYSCALE))
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, y_name), cv2.IMREAD_GRAYSCALE))
-            scores = net.predict_single_flow_stack(flow_stack, 'fc-action')
+            scores = net.predict_single_flow_stack(np.array(flow_stack), 'fc-action')
             frame_scores.append(scores)
 
-    print 'video {} done '.format(vid)
+    print 'video {} done'.format(vid)
     sys.stdin.flush()
     return np.array(frame_scores), label
 
-
-pool = multiprocessing.Pool(8, initializer=build_net)
-
-
-video_scores = pool.map(eval_video, eval_video_list)
+if args.num_worker > 1:
+    pool = multiprocessing.Pool(args.num_worker, initializer=build_net)
+    video_scores = pool.map(eval_video, eval_video_list)
+else:
+    build_net()
+    video_scores = map(eval_video, eval_video_list)
 
 video_pred = [np.argmax(default_aggregation_func(x[0])) for x in video_scores]
 video_labels = [x[1] for x in video_scores]
