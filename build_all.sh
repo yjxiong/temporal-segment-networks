@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 CAFFE_USE_MPI=${0:-OFF}
-CAFFE_MPI_PREFIX=${MPI_PREFIX:-}
+CAFFE_MPI_PREFIX=${MPI_PREFIX}:-""}
 
 # update the submodules: Caffe and Dense Flow
 git submodule update --remote
@@ -57,7 +57,7 @@ echo "Building Caffe"
 cd ../../caffe-action
 [[ -d build ]] || mkdir build
 cd build
-OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake .. CAFFE_USE_MPI=${CAFFE_USE_MPI} MPI_CXX_COMPILER=${CAFFE_MPI_PREFIX}/bin/mpicxx
+OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake .. -DUSE_MPI=${CAFFE_USE_MPI} -DMPI_CXX_COMPILER="${CAFFE_MPI_PREFIX}/bin/mpicxx"
 make -j32 install
 echo "Caffe Built"
 cd ../../../

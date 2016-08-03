@@ -1,4 +1,4 @@
-net: "models/hmdb51/tsn_bn_inception_spatial_train_val.prototxt"
+net: "models/ucf101/tsn_bn_inception_rgb_train_val.prototxt"
 
 # testing parameter
 test_iter:950
@@ -9,7 +9,7 @@ test_initialization: true
 display: 20
 average_loss: 20
 #snapshot: 500
-snapshot_prefix: "models/hmdb51_tsn_bn_inception_spatial_split_1"
+snapshot_prefix: "models/ucf101_split1_tsn_rgb_bn_inception"
 debug_info: false
 
 # learning rate

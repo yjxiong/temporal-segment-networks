@@ -2,5 +2,6 @@
 	path = lib/dense_flow
 	url = https://github.com/yjxiong/dense_flow
 [submodule "lib/caffe_action"]
-	path = lib/caffe_action
+	path = lib/caffe-action
 	url = https://github.com/yjxiong/caffe
+	branch=action_recog
