@@ -1,4 +1,4 @@
-#Temporal Segment Networks (TSN)
+Temporal Segment Networks (TSN)
 -------------------------------
 
 This repository holds the codes and models for the paper
@@ -21,6 +21,8 @@ There are a few dependencies to run the code. The major libraries we use are
 - [dense_flow][df]
 
 The codebase is written in Python. We recommend the [Anaconda][anaconda] Python distribution. Matlab scripts are provided for some critical steps like video-level testing.
+
+The most straightforward method to install these libraries is to run the `build-all.sh` script.
 
 Besides software, GPU(s) are required for optical flow extraction and model training. Our Caffe modification supports highly efficient parallel training. So throw in as many GPUs as you like and enjoy faster training.
 
@@ -96,6 +98,12 @@ python tools/eval_scores.py score_file
 ```
 
 The more important function of `eval_scores.py` is to do score fusion.
+For example, once we got the scores of spatial stream in `spatial_score_file` and temporal stream in `temporal_score_file`.
+The fusion result with weights of `1:1.5` can be achieved with
+
+```
+python tools/eval_scores.py spatial_score_file temporal_score_file --score_weights 1 1.5
+```
 
 To view the full help message of these scripts, run `python eval_net.py -h` or `python eval_scores.py -h`. 
 
