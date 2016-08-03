@@ -80,31 +80,24 @@ bash scripts/get_reference_model.sh
 
 We provide a Python framework to run the testing. For the benchmark datasets, we will test average accuracy on the testing splits. We also provide the facility to analyze a single video.
 
-Generally, to test on the benchmark dataset, we can run the command
+Generally, to test on the benchmark dataset, we can use the scripts `eval_net.py` and `eval_scores.py`.
 
+For example, to test the spatial stream model on split 1 of ucf 101 with 4 GPUs, run
 ```
-python tools/eval_net.py \
-    --rgb_net path_to_rgb_net \
-    --rgb_net_weights path_rgb_net_weights \
-    --flow_net path_to_flow_net \
-    --flow_net_weights path_flow_net_weights \
-    --db UCF-101 --frame_path path_to_frames --split 1 
+python tools/eval_net.py ucf101 1 rgb flow_path rgb_net_proto rgb_net_weights --num_worker 4 --save_scores score_file
 ```
 
-To cache the scores on harddisk, one can add the flag `--rgb_score path_to_rgb_score_file` to the command.
+This command also caches the scores on harddisk in file `score_file`.
 
 One can also use cached score files to evaluate the performance. To do this, issue the following command
 
 ```
-python tools/eval_net.py \
-    --rgb_score path_to_rgb_score_file \
-    --flow_score path_to_flow_score_file \
-    --db UCF-101 --frame_path path_to_frames --split 1 
+python tools/eval_scores.py score_file
 ```
 
-The flags `--rgb(flow)_net` and `--rgb(flow)_score` can be mixed in a command. For example, one can use cached scores for a RGB model and extract scores using a flow model. 
+The more important function of `eval_scores.py` is to do score fusion.
 
-To view the full help message of `eval_net.py`, run `python eval_net.py -h`. 
+To view the full help message of these scripts, run `python eval_net.py -h` or `python eval_scores.py -h`. 
 
 ## Training Temporal Segment Networks
  
