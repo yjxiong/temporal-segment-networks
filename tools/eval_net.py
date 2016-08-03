@@ -28,8 +28,10 @@ parser.add_argument('--num_frame_per_video', type=int, default=25,
                     help="prefix of y direction flow images")
 parser.add_argument('--save_scores', type=str, default=None, help='the filename to save the scores in')
 parser.add_argument('--num_worker', type=int, default=1)
-parser.add_argument("--caffe_path", type=str, default='./lib/caffe_action/', help='path to the caffe toolbox')
+parser.add_argument("--caffe_path", type=str, default='./lib/caffe-action/', help='path to the caffe toolbox')
 args = parser.parse_args()
+
+print args
 
 sys.path.append(os.path.join(args.caffe_path, 'python'))
 from pyActionRecog.action_caffe import CaffeNet

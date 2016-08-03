@@ -1,6 +1,7 @@
 # local files
 local/
 logs/
+3rd-party/
 
 # data files
 data/
