@@ -3,13 +3,32 @@ Temporal Segment Networks (TSN)
 
 This repository holds the codes and models for the paper
  
+> 
 **Temporal Segment Networks: Towards Good Practices for Deep Action Recognition**,
 Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool,
 *ECCV 2016*, Amsterdam, Netherland.
+>
 
 ##[FAQ][faq]
 
 Below is the guidance to reproduce the reported results and explore more.
+
+* [Usage Guide](#usage-guide)
+  * [Prerequisites](#prerequisites)
+  * [Code & Data Preparation](#code--data-preparation)
+    * [Get the code](#get-the-code)
+    * [Get the videos](#get-the-videos)
+    * [Get trained models](#get-trained-models)
+  * [Extract Frames and Optical Flow Images](#extract-frames-and-optical-flow-images)
+  * [Testing Provided Models](#testing-provided-models)
+    * [Get reference models](#get-reference-models)
+    * [Video-level testing](#video-level-testing)
+  * [Training Temporal Segment Networks](#training-temporal-segment-networks)
+* [Other Info](#other-info)
+  * [Citation](#citation)
+  * [Related Projects](#related-projects)
+  * [Contact](#contact)
+
 
 # Usage Guide
 
