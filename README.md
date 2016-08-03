@@ -39,13 +39,20 @@ Then run the building scripts to build the libraries.
 ```
 bash build-all.sh
 ```
-It will build Caffe and dense_flow. Since we need OpenCV to have Video IO, which is absent in most default installations, it will also download and build a local installation of OpenCV and use its Python interfaces. 
+It will build Caffe and dense_flow. Since we need OpenCV to have Video IO, which is absent in most default installations, it will also download and build a local installation of OpenCV and use its Python interfaces.
+
+Note that to run training with multiple GPUs, one needs to enable MPI support of Caffe. To do this, run
+
+```
+MPI_PREFIX=<root path to openmpi installation> build-all.sh MPI_ON
+```
 
 ### Get the videos
-We experimented on two mainstream action recognition dataset: [UCF-101][ucf101] and [HMDB51][hmdb51]. Videos can be downloaded directly from their websites.
+We experimented on two mainstream action recognition datasets: [UCF-101][ucf101] and [HMDB51][hmdb51]. Videos can be downloaded directly from their websites.
 After download, please extract the videos from the `rar` archives.
 - UCF101: the ucf101 videos are archived in the downloaded file. Please use `unrar x UCF-101.rar` to extract the videos.
-- HMDB51: the HMDB51 video archive has two-level of packaging. The following commands illustrate to extract the videos inside.
+- HMDB51: the HMDB51 video archive has two-level of packaging.
+The following commands illustrate how to extract the videos.
 ```
 mkdir rars && mkdir videos
 unrar x hmdb51-org.rar rars/
@@ -123,7 +130,24 @@ To view the full help message of these scripts, run `python eval_net.py -h` or `
 ## Citation
 Please cite the following paper if you feel this repository useful.
 
+@inproceedings{TSN2016ECCV,
+  author    = {Limin Wang and
+               Yuanjun Xiong and
+               Zhe Wang and
+               Yu Qiao and
+               Dahua Lin and
+               Xiaoou Tang and
+               Luc {Val Gool}},
+  title     = {Temporal Segment Networks: Towards Good Practices for Deep Action Recognition},
+  booktitle   = {ECCV},
+  year      = {2016},
+}
+
 ## Related Projects
+
+- [CES-STAR@ActivityNet][anet] : we won ActivityNet challenge 2016 based on TSN
+- [TDD][tdd]: Trajectory-pooled Deep Descriptors for action recognition.
+- [Very Deep Two Stream CNNs][caffe]
 
 ## Contact
 For any question, please contact
@@ -137,4 +161,6 @@ Limin Wang: lmwang.nju@gmail.com
 [caffe]:https://github.com/yjxiong/caffe
 [df]:https://github.com/yjxiong/dense_flow
 [anaconda]:https://www.continuum.io/downloads
+[tdd]:https://github.com/wanglimin/TDD
+[anet]:https://github.com/yjxiong/anet2016-cuhk
 
