@@ -7,9 +7,9 @@ This repository holds the codes and models for the paper
 Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool,
 *ECCV 2016*, Amsterdam, Netherland.
 
-It can be used for general video-based action recognition tasks. 
+##[FAQ][faq]
 
-Below is the step-by-step guide to reproduce the reported results.
+Below is the guidance to reproduce the reported results and explore more.
 
 # Usage Guide
 
@@ -165,4 +165,5 @@ Limin Wang: lmwang.nju@gmail.com
 [anaconda]:https://www.continuum.io/downloads
 [tdd]:https://github.com/wanglimin/TDD
 [anet]:https://github.com/yjxiong/anet2016-cuhk
+[faq]:https://github.com/yjxiong/temporal-segment-networks/wiki/Frequently-Asked-Questions
 
