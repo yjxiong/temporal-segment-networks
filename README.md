@@ -24,7 +24,7 @@ The codebase is written in Python. We recommend the [Anaconda][anaconda] Python 
 
 The most straightforward method to install these libraries is to run the `build-all.sh` script.
 
-Besides software, GPU(s) are required for optical flow extraction and model training. Our Caffe modification supports highly efficient parallel training. So throw in as many GPUs as you like and enjoy faster training.
+Besides software, GPU(s) are required for optical flow extraction and model training. Our Caffe modification supports highly efficient parallel training. Just throw in as many GPUs as you like and enjoy.
 
 ## Code & Data Preparation
 
@@ -130,7 +130,7 @@ To view the full help message of these scripts, run `python eval_net.py -h` or `
 
 ## Citation
 Please cite the following paper if you feel this repository useful.
-
+```
 @inproceedings{TSN2016ECCV,
   author    = {Limin Wang and
                Yuanjun Xiong and
@@ -143,6 +143,7 @@ Please cite the following paper if you feel this repository useful.
   booktitle   = {ECCV},
   year      = {2016},
 }
+```
 
 ## Related Projects
 
