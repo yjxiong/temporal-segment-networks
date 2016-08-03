@@ -1,4 +1,4 @@
-Temporal Segment Networks (TSN)
+#Temporal Segment Networks (TSN)
 -------------------------------
 
 This repository holds the codes and models for the paper
@@ -35,7 +35,7 @@ Below is the guidance to reproduce the reported results and explore more.
 # Usage Guide
 
 ## Prerequisites
-[[back to top](#contents)]
+[[back to top](#temporal-segment-networks-tsn)]
 
 There are a few dependencies to run the code. The major libraries we use are
 
