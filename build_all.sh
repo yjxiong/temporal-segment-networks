@@ -57,7 +57,11 @@ echo "Building Caffe, MPI status: ${CAFFE_USE_MPI}"
 cd ../../caffe-action
 [[ -d build ]] || mkdir build
 cd build
+if [$CAFFE_USE_MPI == "ON"]; then
 OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake .. -DUSE_MPI=${CAFFE_USE_MPI} -DMPI_CXX_COMPILER="${CAFFE_MPI_PREFIX}/bin/mpicxx"
+else
+OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake ..
+fi
 make -j32 install
 echo "Caffe Built"
 cd ../../../
