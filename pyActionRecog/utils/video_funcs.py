@@ -12,9 +12,9 @@ def default_aggregation_func(score_arr, normalization=True):
     :return:
     """
     if normalization:
-        return softmax(score_arr.max(axis=1).mean(axis=0))
+        return softmax(score_arr.mean(axis=1).mean(axis=0))
     else:
-        return score_arr.max(axis=1).mean(axis=0)
+        return score_arr.mean(axis=1).mean(axis=0)
 
 
 def sliding_window_aggregation_func(score, spans=[1, 2, 4, 8, 16], overlap=0.2, norm=True, fps=1):

@@ -38,7 +38,7 @@ def flow_stack_oversample(flow_stack, crop_dims):
         cp = crop_ix[ix]
         crops[ix] = flow_stack[:, cp[0]:cp[2], cp[1]:cp[3]]
 
-    crops[5:] = crops[5:, :, ::-1, :]
+    crops[5:] = crops[5:, :, :, ::-1]
     crops[5:, range(0, stack_depth, 2), ...] = 255 - crops[5:, range(0, stack_depth, 2), ...]
 
     return crops
