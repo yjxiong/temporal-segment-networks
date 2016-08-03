@@ -13,6 +13,8 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 Below is the guidance to reproduce the reported results and explore more.
 
+----
+# Contents
 * [Usage Guide](#usage-guide)
   * [Prerequisites](#prerequisites)
   * [Code & Data Preparation](#code--data-preparation)
@@ -29,10 +31,11 @@ Below is the guidance to reproduce the reported results and explore more.
   * [Related Projects](#related-projects)
   * [Contact](#contact)
 
-
+----
 # Usage Guide
 
 ## Prerequisites
+[[back to top](#contents)]
 
 There are a few dependencies to run the code. The major libraries we use are
 
