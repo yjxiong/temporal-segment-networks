@@ -53,7 +53,7 @@ make -j
 echo "Dense Flow built"
 
 # build caffe
-echo "Building Caffe"
+echo "Building Caffe, MPI status: ${CAFFE_USE_MPI}"
 cd ../../caffe-action
 [[ -d build ]] || mkdir build
 cd build
