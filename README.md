@@ -51,6 +51,8 @@ Besides software, GPU(s) are required for optical flow extraction and model trai
 ## Code & Data Preparation
 
 ### Get the code
+[[back to top](#temporal-segment-networks-tsn)]
+
 Use git to clone this repository and its submodules
 ```
 git clone --recursive https://github.com/yjxiong/temporal-segment-networks
@@ -70,6 +72,8 @@ MPI_PREFIX=<root path to openmpi installation> build-all.sh MPI_ON
 ```
 
 ### Get the videos
+[[back to top](#temporal-segment-networks-tsn)]
+
 We experimented on two mainstream action recognition datasets: [UCF-101][ucf101] and [HMDB51][hmdb51]. Videos can be downloaded directly from their websites.
 After download, please extract the videos from the `rar` archives.
 - UCF101: the ucf101 videos are archived in the downloaded file. Please use `unrar x UCF-101.rar` to extract the videos.
@@ -82,6 +86,8 @@ for a in $(ls rars) do; unrar x $a videos/; done;
 ```
 
 ### Get trained models
+[[back to top](#temporal-segment-networks-tsn)]
+
 We provided the trained model weights in Caffe style, consisting of specifications in Protobuf messages, and model weights.
 In the codebase we provide the model spec for UCF101 and HMDB51.
 The model weights can be downloaded by running the script
@@ -91,6 +97,7 @@ bash models/get_reference_models.sh
 ```
 
 ## Extract Frames and Optical Flow Images
+[[back to top](#temporal-segment-networks-tsn)]
 
 To run the training and testing, we need to decompose the video into frames. Also the temporal stream networks need optical flow or warped optical flow images for input.
  
@@ -110,6 +117,8 @@ It will take from several hours to several days to extract optical flows for the
 ## Testing Provided Models
 
 ### Get reference models
+[[back to top](#temporal-segment-networks-tsn)]
+
 To help reproduce the results reported in the paper, we provide reference models trained by us for instant testing. Please use the following command to get the reference models.
 
 ```
@@ -117,6 +126,7 @@ bash scripts/get_reference_model.sh
 ```
 
 ### Video-level testing
+[[back to top](#temporal-segment-networks-tsn)]
 
 We provide a Python framework to run the testing. For the benchmark datasets, we will test average accuracy on the testing splits. We also provide the facility to analyze a single video.
 
@@ -147,8 +157,10 @@ python tools/eval_scores.py RGB_SCORE_FILE FLOW_SCORE_FILE --score_weights 1 1.5
 To view the full help message of these scripts, run `python eval_net.py -h` or `python eval_scores.py -h`. 
 
 ## Training Temporal Segment Networks
+[[back to top](#temporal-segment-networks-tsn)]
  
 #Other Info
+[[back to top](#temporal-segment-networks-tsn)]
 
 ## Citation
 Please cite the following paper if you feel this repository useful.
