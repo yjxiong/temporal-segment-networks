@@ -1,0 +1,32 @@
+net: "models/ucf101/tsn_bn_inception_spatial_train_val.prototxt"
+
+# testing parameter
+test_iter:950
+test_interval: 500
+test_initialization: true
+
+# output
+display: 20
+average_loss: 20
+#snapshot: 500
+snapshot_prefix: "models/ucf101_tsn_bn_inception_spatial_split_1"
+debug_info: false
+
+# learning rate
+base_lr: 0.001
+lr_policy: "step"
+gamma: 0.1
+stepsize: 2000
+max_iter: 4500
+iter_size: 2
+
+# parameter of SGD
+momentum: 0.9
+weight_decay: 0.0005
+clip_gradients: 40
+
+# GPU setting
+solver_mode: GPU
+device_id: [0,1,2,3]
+richness: 200
+

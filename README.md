@@ -52,6 +52,15 @@ unrar x hmdb51-org.rar rars/
 for a in $(ls rars) do; unrar x $a videos/; done;
 ```
 
+### Get trained models
+The trained models are in Caffe style, consisting of specifications in Protobuf messages, and model weights.
+In the codebase we provide the model spec for UCF101 and HMDB51.
+The model weights can be downloaded by running the script
+
+```
+bash models/get_reference_models.sh
+```
+
 ## Extract Frames and Optical Flow Images
 
 To run the training and testing, we need to decompose the video into frames. Also the temporal stream networks need optical flow or warped optical flow images for input.
