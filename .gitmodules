@@ -1,3 +1,6 @@
-[submodule "dense_flow"]
-	path = dense_flow
+[submodule "lib/dense_flow"]
+	path = lib/dense_flow
 	url = https://github.com/yjxiong/dense_flow
+[submodule "lib/caffe_action"]
+	path = lib/caffe_action
+	url = https://github.com/yjxiong/caffe

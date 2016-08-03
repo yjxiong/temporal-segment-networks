@@ -85,8 +85,9 @@ if __name__ == '__main__':
     parser.add_argument("out_dir")
     parser.add_argument("--num_worker", type=int, default=8)
     parser.add_argument("--flow_type", type=str, default='tvl1', choices=['tvl1', 'warp_tvl1'])
-    parser.add_argument("--df_path", type=str, default='./dense_flow/', help='path to the dense_flow toolbo')
-    parser.add_argument("--out_format", type=str, default='dir', choices=['dir','zip'], help='path to the dense_flow toolbo')
+    parser.add_argument("--df_path", type=str, default='./lib/dense_flow/', help='path to the dense_flow toolbox')
+    parser.add_argument("--out_format", type=str, default='dir', choices=['dir','zip'],
+                        help='path to the dense_flow toolbox')
     parser.add_argument("--ext", type=str, default='avi', choices=['avi','mp4'], help='video file extensions')
 
     args = parser.parse_args()
