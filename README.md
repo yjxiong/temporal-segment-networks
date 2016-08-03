@@ -60,7 +60,7 @@ for a in $(ls rars) do; unrar x $a videos/; done;
 ```
 
 ### Get trained models
-The trained models are in Caffe style, consisting of specifications in Protobuf messages, and model weights.
+We provided the trained model weights in Caffe style, consisting of specifications in Protobuf messages, and model weights.
 In the codebase we provide the model spec for UCF101 and HMDB51.
 The model weights can be downloaded by running the script
 
@@ -100,25 +100,26 @@ We provide a Python framework to run the testing. For the benchmark datasets, we
 
 Generally, to test on the benchmark dataset, we can use the scripts `eval_net.py` and `eval_scores.py`.
 
-For example, to test the spatial stream model on split 1 of ucf 101 with 4 GPUs, run
+For example, to test the reference rgb stream model on split 1 of ucf 101 with 4 GPUs, run
 ```
-python tools/eval_net.py ucf101 1 rgb flow_path rgb_net_proto rgb_net_weights --num_worker 4 --save_scores score_file
+python tools/eval_net.py ucf101 1 rgb FRAME_PATH \
+ models/ucf101/tsn_bn_inception_rgb_deploy.prototxt models/ucf101_split_1_tsn_rgb_reference_bn_inception.caffemodel \
+ --num_worker 4 --save_scores SCORE_FILE
 ```
-
-This command also caches the scores on harddisk in file `score_file`.
+where `FRAME_PATH` is the path you extracted the frames of UCF-101 to and `SCORE_FILE` is the filename to store the extracted scores.
 
 One can also use cached score files to evaluate the performance. To do this, issue the following command
 
 ```
-python tools/eval_scores.py score_file
+python tools/eval_scores.py SCORE_FILE
 ```
 
 The more important function of `eval_scores.py` is to do score fusion.
-For example, once we got the scores of spatial stream in `spatial_score_file` and temporal stream in `temporal_score_file`.
+For example, once we got the scores of rgb stream in `RGB_SCORE_FILE` and flow stream in `FLOW_SCORE_FILE`.
 The fusion result with weights of `1:1.5` can be achieved with
 
 ```
-python tools/eval_scores.py spatial_score_file temporal_score_file --score_weights 1 1.5
+python tools/eval_scores.py RGB_SCORE_FILE FLOW_SCORE_FILE --score_weights 1 1.5
 ```
 
 To view the full help message of these scripts, run `python eval_net.py -h` or `python eval_scores.py -h`. 
