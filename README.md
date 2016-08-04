@@ -60,14 +60,14 @@ git clone --recursive https://github.com/yjxiong/temporal-segment-networks
 Then run the building scripts to build the libraries.
 
 ```
-bash build-all.sh
+bash build_all.sh
 ```
 It will build Caffe and dense_flow. Since we need OpenCV to have Video IO, which is absent in most default installations, it will also download and build a local installation of OpenCV and use its Python interfaces.
 
 Note that to run training with multiple GPUs, one needs to enable MPI support of Caffe. To do this, run
 
 ```
-MPI_PREFIX=<root path to openmpi installation> bash build-all.sh MPI_ON
+MPI_PREFIX=<root path to openmpi installation> bash build_all.sh MPI_ON
 ```
 
 ### Get the videos
