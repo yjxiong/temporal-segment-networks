@@ -67,7 +67,7 @@ It will build Caffe and dense_flow. Since we need OpenCV to have Video IO, which
 Note that to run training with multiple GPUs, one needs to enable MPI support of Caffe. To do this, run
 
 ```
-MPI_PREFIX=<root path to openmpi installation> build-all.sh MPI_ON
+MPI_PREFIX=<root path to openmpi installation> bash build-all.sh MPI_ON
 ```
 
 ### Get the videos
