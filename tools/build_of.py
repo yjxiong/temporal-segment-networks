@@ -1,6 +1,5 @@
 __author__ = 'yjxiong'
 
-import cv2
 import os
 import glob
 import sys
@@ -11,6 +10,7 @@ out_path = ''
 
 
 def dump_frames(vid_path):
+    import cv2
     video = cv2.VideoCapture(vid_path)
     vid_name = vid_path.split('/')[-1].split('.')[0]
     out_full_path = os.path.join(out_path, vid_name)
