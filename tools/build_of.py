@@ -3,6 +3,7 @@ __author__ = 'yjxiong'
 import os
 import glob
 import sys
+from pipes import quote
 from multiprocessing import Pool, current_process
 
 import argparse
@@ -49,7 +50,7 @@ def run_optical_flow(vid_item, dev_id=0):
     flow_y_path = '{}/flow_y'.format(out_full_path)
 
     cmd = os.path.join(df_path + 'build/extract_gpu')+' -f {} -x {} -y {} -i {} -b 20 -t 1 -d {} -s 1 -o {} -w 340 -h 256'.format(
-        vid_path, flow_x_path, flow_y_path, image_path, dev_id, out_format)
+        quote(vid_path), quote(flow_x_path), quote(flow_y_path), quote(image_path), dev_id, out_format)
 
     os.system(cmd)
     print '{} {} done'.format(vid_id, vid_name)

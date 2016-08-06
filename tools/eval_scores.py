@@ -3,7 +3,7 @@ import sys
 import numpy as np
 sys.path.append('.')
 
-from pyActionRecog.utils.video_funcs import default_aggregation_func, default_fusion_func
+from pyActionRecog.utils.video_funcs import default_aggregation_func
 from pyActionRecog.utils.metrics import mean_class_accuracy
 
 parser = argparse.ArgumentParser()
