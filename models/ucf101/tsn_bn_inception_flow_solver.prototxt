@@ -17,7 +17,6 @@ base_lr: 0.005
 lr_policy: "multistep"
 gamma: 0.1
 stepvalue: [12000, 18000]
-#stepsize: 12000
 max_iter: 20000
 iter_size: 2
 

@@ -1,7 +1,7 @@
 net: "models/hmdb51/tsn_bn_inception_rgb_train_val.prototxt"
 
 # testing parameter
-test_iter:950
+test_iter: 383
 test_interval: 500
 test_initialization: true
 
@@ -16,8 +16,8 @@ debug_info: false
 base_lr: 0.001
 lr_policy: "step"
 gamma: 0.1
-stepsize: 2000
-max_iter: 4500
+stepsize: 1000
+max_iter: 2500
 iter_size: 2
 
 # parameter of SGD
@@ -29,4 +29,5 @@ clip_gradients: 40
 solver_mode: GPU
 device_id: [0,1,2,3]
 richness: 200
+
 

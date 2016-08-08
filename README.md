@@ -25,6 +25,10 @@ Below is the guidance to reproduce the reported results and explore more.
     * [Get reference models](#get-reference-models)
     * [Video-level testing](#video-level-testing)
   * [Training Temporal Segment Networks](#training-temporal-segment-networks)
+    * [Construct file lists for training and validation](#construct-file-lists-for-training-and-validation)
+    * [Get initialization models](#get-initialization-models)
+    * [Kick off training](#kick-off-training)
+    * [Config the training process](#config-the-training-process)
 * [Other Info](#other-info)
   * [Citation](#citation)
   * [Related Projects](#related-projects)
@@ -92,7 +96,7 @@ In the codebase we provide the model spec for UCF101 and HMDB51.
 The model weights can be downloaded by running the script
 
 ```
-bash models/get_reference_models.sh
+bash scripts/get_reference_models.sh
 ```
 
 ## Extract Frames and Optical Flow Images
@@ -157,6 +161,102 @@ To view the full help message of these scripts, run `python eval_net.py -h` or `
 
 ## Training Temporal Segment Networks
 [[back to top](#temporal-segment-networks-tsn)]
+
+Training TSN is straightforward. We have provided the necessary model specs, solver configs, and initialization models.
+To achieve optimal training speed,
+we strongly advise you to turn on the parallel training support in the Caffe toolbox using following build command
+```
+MPI_PREFIX=<root path to openmpi installation> bash build_all.sh MPI_ON
+```
+
+where `root path to openmpi installation` points to the installation of the OpenMPI, for example `/usr/local/openmpi/`.
+
+### Construct file lists for training and validation
+[[back to top](#temporal-segment-networks-tsn)]
+
+The data feeding in training relies on `VideoDataLayer` in Caffe.
+This layer uses a list file to specify its data sources.
+Each line of the list file will contain a tuple of extracted video frame path, video frame number, and video groundtruth class.
+A list file looks like
+```
+video_frame_path 100 10
+video_2_frame_path 150 31
+...
+```
+To build the file lists for all 3 splits of the two benchmark dataset, we have provided a script.
+Just use the following command
+```
+bash scripts/build_file_list.sh ucf101 FRAME_PATH
+```
+and
+```
+bash scripts/build_file_list.sh hmdb51 FRAME_PATH
+```
+The generated list files will be put in `data/` with names like `ucf101_flow_val_split_2.txt`.
+
+### Get initialization models
+[[back to top](#temporal-segment-networks-tsn)]
+
+We have built the initialization model weights for both rgb and flow input.
+The flow initialization models implements the cross-modality training technique in the paper.
+To download the model weights, run
+```
+bash scripts/get_init_models.sh
+```
+
+### Kick off training
+[[back to top](#temporal-segment-networks-tsn)]
+
+Once all necessities ready, we can start training TSN.
+For this, use the script `scripts/train_tsn.sh`.
+For example, the following command runs training on UCF101 with rgb input
+```
+bash scripts/train_tsn.sh ucf101 rgb
+```
+the training will run with default settings on 4 GPUs.
+Usually, it takes around 2 hours to train the rgb model and 8 hours for flow models, on 4 GTX Titan X GPUs.
+
+The learned model weights will be saved in `models/`.
+The aforementioned testing process can be used to evaluate them.
+
+### Config the training process
+[[back to top](#temporal-segment-networks-tsn)]
+
+Here are some information on customizing the training process
+- **Change split**: By default, the training is conducted on split 1 of the datasets.
+To change the split, one can modify corresponding model specs and solver files.
+For example, to train on split 2 of UCF101 with rgb input, one can modify the file `models/ucf101/tsn_bn_inception_rgb_train_val.prototxt`.
+On line 8, change
+```
+source: "data/ucf101_rgb_train_split_1.txt"`
+```
+to
+```
+`source: "data/ucf101_rgb_train_split_2.txt"`
+```
+On line 34, change
+```
+source: "data/ucf101_rgb_val_split_1.txt"
+```
+to
+```
+source: "data/ucf101_rgb_val_split_2.txt"
+```
+Also, in the solver file `models/ucf101/tsn_bn_inception_rgb_solver.prototxt`, on line 12 change
+```
+snapshot_prefix: "models/ucf101_split1_tsn_rgb_bn_inception"
+```
+to
+```
+snapshot_prefix: "models/ucf101_split2_tsn_rgb_bn_inception"
+```
+in order to distiguish the learned weights.
+- **Change GPU number**, in general, one can use any number of GPU to do the training.
+To use more or less GPU, one can change the `N_GPU` in `scripts/train_tsn.sh`.
+**Important notice**: when the GPU number is changed, the effective batchsize is also changed.
+It's better to always make sure the effective batchsize, which equals to `batch_size*iter_size*n_gpu`, to be **256**.
+Here, `batch_size` is the number in the model's prototxt, for example [line 8](bs_line)
+in `models/ucf101/tsn_bn_inception_rgb_train_val.protoxt`.
  
 #Other Info
 [[back to top](#temporal-segment-networks-tsn)]
@@ -199,4 +299,5 @@ Limin Wang: lmwang.nju@gmail.com
 [tdd]:https://github.com/wanglimin/TDD
 [anet]:https://github.com/yjxiong/anet2016-cuhk
 [faq]:https://github.com/yjxiong/temporal-segment-networks/wiki/Frequently-Asked-Questions
+[bs_line]:https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_flow_train_val.prototxt#L8
 
