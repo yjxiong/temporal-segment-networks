@@ -79,7 +79,12 @@ def parse_ucf_splits():
 
 
 def parse_hmdb51_splits():
-    class_files = glob.glob('data/hmdb51_splits/*.txt')
+    # load split file
+    class_files = glob.glob('data/hmdb51_splits/*split*.txt')
+
+    # load class list
+    class_list = [x.strip() for x in open('data/hmdb51_splits/class_list.txt')]
+    class_dict = {x: i for i, x in enumerate(class_list)}
 
     def parse_class_file(filename):
         # parse filename parts
@@ -95,11 +100,6 @@ def parse_hmdb51_splits():
         return class_name, split_id, train_videos, test_videos
 
     class_info_list = map(parse_class_file, class_files)
-
-    classes = [x[0] for x in class_info_list]
-
-    class_dict = {x: i for i, x in
-                  enumerate(sorted(list(set(classes))))}
 
     splits = []
     for i in xrange(1, 4):

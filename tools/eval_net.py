@@ -50,7 +50,8 @@ score_name = 'fc-action'
 
 def build_net():
     global net
-    my_id = multiprocessing.current_process()._identity[0] if args.num_worker > 1 else 1
+    my_id = multiprocessing.current_process()._identity[0] \
+        if args.num_worker > 1 else 1
     net = CaffeNet(args.net_proto, args.net_weights, my_id-1)
 
 
@@ -68,11 +69,13 @@ def eval_video(video):
     elif args.modality == 'flow':
         stack_depth = 5
 
-    step = (frame_cnt - stack_depth + 1) / (args.num_frame_per_video-1)
+    step = (frame_cnt - stack_depth) / (args.num_frame_per_video-1)
     if step > 0:
-        frame_ticks = range(1, frame_cnt+1, step)
+        frame_ticks = range(1, min((2 + step * (args.num_frame_per_video-1)), frame_cnt+1), step)
     else:
         frame_ticks = [1] * args.num_frame_per_video
+
+    assert(len(frame_ticks) == args.num_frame_per_video)
 
     frame_scores = []
     for tick in frame_ticks:
