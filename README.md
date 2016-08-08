@@ -171,7 +171,7 @@ where `root path to openmpi installation` points to the installation of the Open
 [[back to top](#temporal-segment-networks-tsn)]
 
 The data feeding in training relies on `VideoDataLayer` in Caffe.
-This layers uses a list file to specify its data sources.
+This layer uses a list file to specify its data sources.
 Each line of the list file will contain a tuple of extracted video frame path, video frame number, and video groundtruth class.
 A list file looks like
 ```
@@ -203,9 +203,9 @@ bash scripts/get_init_models.sh
 ### Kick off training
 [[back to top](#temporal-segment-networks-tsn)]
 
-Once all necessities ready, we can start training tsn.
+Once all necessities ready, we can start training TSN.
 For this, use the script `scripts/train_tsn.sh`.
-For example, run training on UCF101 with rgb input, run
+For example, the following command runs training on UCF101 with rgb input
 ```
 bash scripts/train_tsn.sh ucf101 rgb
 ```
@@ -220,7 +220,7 @@ The aforementioned testing process can be used to evaluate them.
 
 Here are some information on customizing the training process
 - **Change split**: By default, the training is conducted on split 1 of the datasets.
-To change the split, one can modify corresponding model spec and solver files.
+To change the split, one can modify corresponding model specs and solver files.
 For example, to train on split 2 of UCF101 with rgb input, one can modify the file `models/ucf101/tsn_bn_inception_rgb_train_val.prototxt`.
 On line 8, change
 ```
@@ -251,7 +251,8 @@ in order to distiguish the learned weights.
 To use more or less GPU, one can change the `N_GPU` in `scripts/train_tsn.sh`.
 **Important notice**: when the GPU number is changed, the effective batchsize is also changed.
 It's better to always make sure the effective batchsize, which equals to `batch_size*iter_size*n_gpu`, to be **256**.
-Here, `batch_size` is the number set for training in the model's prototxt.
+Here, `batch_size` is the number in the model's prototxt, for example [line 8](bs_line)
+in `models/ucf101/tsn_bn_inception_rgb_train_val.protoxt`.
  
 #Other Info
 [[back to top](#temporal-segment-networks-tsn)]
@@ -294,4 +295,5 @@ Limin Wang: lmwang.nju@gmail.com
 [tdd]:https://github.com/wanglimin/TDD
 [anet]:https://github.com/yjxiong/anet2016-cuhk
 [faq]:https://github.com/yjxiong/temporal-segment-networks/wiki/Frequently-Asked-Questions
+[bs_line]:https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_flow_train_val.prototxt#L8
 
