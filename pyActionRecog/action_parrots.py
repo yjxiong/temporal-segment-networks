@@ -3,8 +3,6 @@ import sys
 
 import cv2
 from utils.io import flow_stack_oversample, rgb_to_parrots
-
-
 import pyparrots.dnn as dnn
 
 
@@ -60,6 +58,43 @@ class ParrotsNet(object):
             with self._parrots_session.flow("main") as flow:
                 flow.set_input('data', feed_data.astype(np.float32, order='C'))
                 flow.forward()
-                score_list.append(flow.data(score_name).value().T)
+                score_list.append(flow.data(score_name).value().T[:step])
 
-        return np.stack(score_list, axis=0)
+        if over_sample:
+            tmp = np.stack(score_list, axis=0)
+            return tmp.reshape((len(frame_list), 10, score_list[0].shape[-1]))
+        else:
+            return np.stack(score_list, axis=0)
+
+    def predict_flow_stack_list(self, flow_stack_list, score_name, over_sample=True, frame_size=None):
+
+        if frame_size is not None:
+            for i in xrange(len(flow_stack_list)):
+                flow_stack_list[i] = np.array([cv2.resize(x, frame_size) for x in flow_stack_list[i]])
+
+        if over_sample:
+            os_frame = np.stack([flow_stack_oversample(stack, (self._sample_shape[2], self._sample_shape[3]))
+                        for stack in flow_stack_list])
+        else:
+            os_frame = np.array(flow_stack_list)
+
+        os_frame -= 128
+
+        bs = self._sample_shape[0]
+        feed_data = np.zeros(self._sample_shape)
+
+        score_list = []
+        for offset in xrange(0, os_frame.shape[0], bs):
+            step = min(bs, os_frame.shape[0] - offset)
+            feed_data[:step, ...] = os_frame[offset:offset + step, ...]
+
+            with self._parrots_session.flow("main") as flow:
+                flow.set_input('data', feed_data.astype(np.float32, order='C'))
+                flow.forward()
+                score_list.append(flow.data(score_name).value().T[:step])
+
+        if over_sample:
+            tmp = np.stack(score_list, axis=0)
+            return tmp.reshape((len(flow_stack_list), 10, score_list[0].shape[-1]))
+        else:
+            return np.stack(score_list, axis=0)
