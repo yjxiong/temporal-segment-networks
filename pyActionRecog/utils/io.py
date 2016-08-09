@@ -42,3 +42,63 @@ def flow_stack_oversample(flow_stack, crop_dims):
     crops[5:, range(0, stack_depth, 2), ...] = 255 - crops[5:, range(0, stack_depth, 2), ...]
 
     return crops
+
+
+def rgb_oversample(image, crop_dims):
+    """
+    Crop images into the four corners, center, and their mirrored versions.
+    Adapted from Caffe
+    Parameters
+    ----------
+    image : (H x W x K) ndarray
+    crop_dims : (height, width) tuple for the crops.
+    Returns
+    -------
+    crops : (10 x H x W x K) ndarray of crops.
+    """
+    # Dimensions and center.
+    im_shape = np.array(image.shape)
+    crop_dims = np.array(crop_dims)
+    im_center = im_shape[:2] / 2.0
+
+    # Make crop coordinates
+    h_indices = (0, im_shape[0] - crop_dims[0])
+    w_indices = (0, im_shape[1] - crop_dims[1])
+    crops_ix = np.empty((5, 4), dtype=int)
+    curr = 0
+    for i in h_indices:
+        for j in w_indices:
+            crops_ix[curr] = (i, j, i + crop_dims[0], j + crop_dims[1])
+            curr += 1
+    crops_ix[4] = np.tile(im_center, (1, 2)) + np.concatenate([
+        -crop_dims / 2.0,
+         crop_dims / 2.0
+    ])
+    crops_ix = np.tile(crops_ix, (2, 1))
+
+    # Extract crops
+    crops = np.empty((10 , crop_dims[0], crop_dims[1],
+                      im_shape[-1]), dtype=np.float32)
+
+    ix = 0
+    for crop in crops_ix:
+        crops[ix] = image[crop[0]:crop[2], crop[1]:crop[3], :]
+        ix += 1
+    crops[ix-5:ix] = crops[ix-5:ix, :, ::-1, :]  # flip for mirrors
+    return crops
+
+
+def rgb_to_parrots(frame, oversample=True, mean_val=None, crop_size=None):
+    """
+    Pre-process the rgb frame for Parrots input
+    """
+    if mean_val is None:
+        mean_val = [104, 117, 123]
+    if not oversample:
+        ret_frame = (frame - mean_val).transpose((2, 0, 1))
+        return ret_frame[None, ...]
+    else:
+        crops = rgb_oversample(frame, crop_size) - mean_val
+        ret_frames = crops.transpose((0, 3, 1, 2))
+        return ret_frames
+
