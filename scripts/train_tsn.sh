@@ -12,5 +12,4 @@ echo "logging to ${LOG_FILE}"
 
 mpirun -np $N_GPU \
 $TOOLS/caffe train --solver=models/${DATASET}/tsn_bn_inception_${MODALITY}_solver.prototxt  \
-   --weights=models/bn_inception_${MODALITY}_init.caffemodel \
-2>&1 > ${LOG_FILE}
+   --weights=models/bn_inception_${MODALITY}_init.caffemodel 2>&1 | tee ${LOG_FILE}
