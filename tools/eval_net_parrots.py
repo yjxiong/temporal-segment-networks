@@ -36,6 +36,12 @@ print args
 sys.path.append(args.parrots_path)
 from pyActionRecog.action_parrots import ParrotsNet
 
+
+def build_net():
+    global net
+    net = ParrotsNet(args.parrots_session)
+build_net()
+
 # build neccessary information
 print args.dataset
 split_tp = parse_split_file(args.dataset)
@@ -45,12 +51,7 @@ f_info = parse_directory(args.frame_path,
 
 eval_video_list = split_tp[args.split - 1][1]
 
-score_name = 'fc-action'
-
-
-def build_net():
-    global net
-    net = ParrotsNet(args.parrots_session)
+score_name = 'fc_action'
 
 
 def eval_video(video):
@@ -86,26 +87,27 @@ def eval_video(video):
         scores = net.predict_rgb_frame_list(frame_list, score_name, frame_size=(340, 256))
 
     if args.modality == 'flow':
-        frame_stack_list = []
+        flow_stack_list = []
         for tick in frame_ticks:
             frame_idx = [min(frame_cnt, tick+offset) for offset in xrange(stack_depth)]
+
             flow_stack = []
             for idx in frame_idx:
                 x_name = '{}{:05d}.jpg'.format(args.flow_x_prefix, idx)
                 y_name = '{}{:05d}.jpg'.format(args.flow_y_prefix, idx)
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, x_name), cv2.IMREAD_GRAYSCALE))
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, y_name), cv2.IMREAD_GRAYSCALE))
-            frame_stack_list.append(np.array(flow_stack))
 
+            flow_stack_list.append(np.array(flow_stack))
         # run predication in batches
-        scores = net.predict_frame_stack_list(frame_stack_list, score_name, frame_size=(340, 256))
+        scores = net.predict_flow_stack_list(flow_stack_list, score_name, frame_size=(340, 256))
 
     print 'video {} done'.format(vid)
     sys.stdin.flush()
     return scores, label
 
 
-build_net()
+
 video_scores = map(eval_video, eval_video_list)
 
 video_pred = [np.argmax(default_aggregation_func(x[0])) for x in video_scores]

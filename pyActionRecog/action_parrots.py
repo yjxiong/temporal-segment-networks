@@ -32,17 +32,17 @@ class ParrotsNet(object):
 
         if over_sample:
             if multiscale is None:
-                os_frame = np.array([rgb_to_parrots(x, mean_val=self._channel_mean,
+                os_frame = np.concatenate([rgb_to_parrots(x, mean_val=self._channel_mean,
                                           crop_size=(self._sample_shape[2], self._sample_shape[3]))
-                            for x in frame_list])
+                                     for x in frame_list], axis=0)
             else:
                 os_frame = []
                 for scale in multiscale:
                     resized_frame_list = [cv2.resize(x, (0, 0), fx=1.0 / scale, fy=1.0 / scale) for x in frame_list]
-                    os_frame.extend(np.array([rgb_to_parrots(x, mean_val=self._channel_mean,
+                    os_frame.extend(np.concatenate([rgb_to_parrots(x, mean_val=self._channel_mean,
                                           crop_size=(self._sample_shape[2], self._sample_shape[3]))
                                     for x in resized_frame_list]))
-                os_frame = np.stack(os_frame, axis=0)
+                os_frame = np.concatenate(os_frame, axis=0)
         else:
             os_frame = rgb_to_parrots(False)
 
@@ -61,10 +61,10 @@ class ParrotsNet(object):
                 score_list.append(flow.data(score_name).value().T[:step])
 
         if over_sample:
-            tmp = np.stack(score_list, axis=0)
-            return tmp.reshape((len(frame_list), 10, score_list[0].shape[-1]))
+            tmp = np.concatenate(score_list, axis=0)
+            return tmp.reshape((len(os_frame) / 10, 10, score_list[0].shape[-1]))
         else:
-            return np.stack(score_list, axis=0)
+            return np.concatenate(score_list, axis=0)
 
     def predict_flow_stack_list(self, flow_stack_list, score_name, over_sample=True, frame_size=None):
 
@@ -73,8 +73,9 @@ class ParrotsNet(object):
                 flow_stack_list[i] = np.array([cv2.resize(x, frame_size) for x in flow_stack_list[i]])
 
         if over_sample:
-            os_frame = np.stack([flow_stack_oversample(stack, (self._sample_shape[2], self._sample_shape[3]))
-                        for stack in flow_stack_list])
+            tmp = [flow_stack_oversample(stack, (self._sample_shape[2], self._sample_shape[3]))
+                                        for stack in flow_stack_list]
+            os_frame = np.concatenate(tmp, axis=0)
         else:
             os_frame = np.array(flow_stack_list)
 
@@ -94,7 +95,7 @@ class ParrotsNet(object):
                 score_list.append(flow.data(score_name).value().T[:step])
 
         if over_sample:
-            tmp = np.stack(score_list, axis=0)
-            return tmp.reshape((len(flow_stack_list), 10, score_list[0].shape[-1]))
+            tmp = np.concatenate(score_list, axis=0)
+            return tmp.reshape((len(os_frame) / 10, 10, score_list[0].shape[-1]))
         else:
-            return np.stack(score_list, axis=0)
+            return np.concatenate(score_list, axis=0)
