@@ -107,7 +107,7 @@ To run the training and testing, we need to decompose the video into frames. Als
 These can be achieved with the script `scripts/extract_optical_flow.sh`. The script has three arguments
 - `SRC_FOLDER` points to the folder where you put the video dataset
 - `OUT_FOLDER` points to the root folder where the extracted frames and optical images will be put in
-- `NUM_WORKER` specifies the number of GPU to use in parallel for flow extraction, must ber larger than 1
+- `NUM_WORKER` specifies the number of GPU to use in parallel for flow extraction, must be larger than 1
 
 The command for running optical flow extraction is as follows
 
@@ -131,7 +131,7 @@ bash scripts/get_reference_model.sh
 ### Video-level testing
 [[back to top](#temporal-segment-networks-tsn)]
 
-We provide a Python framework to run the testing. For the benchmark datasets, we will test average accuracy on the testing splits. We also provide the facility to analyze a single video.
+We provide a Python framework to run the testing. For the benchmark datasets, we will measure average accuracy on the testing splits. We also provide the facility to analyze a single video.
 
 Generally, to test on the benchmark dataset, we can use the scripts `eval_net.py` and `eval_scores.py`.
 
@@ -149,7 +149,7 @@ One can also use cached score files to evaluate the performance. To do this, iss
 python tools/eval_scores.py SCORE_FILE
 ```
 
-The more important function of `eval_scores.py` is to do score fusion.
+The more important function of `eval_scores.py` is to do modality fusion.
 For example, once we got the scores of rgb stream in `RGB_SCORE_FILE` and flow stream in `FLOW_SCORE_FILE`.
 The fusion result with weights of `1:1.5` can be achieved with
 
