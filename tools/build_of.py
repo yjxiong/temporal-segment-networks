@@ -49,8 +49,8 @@ def run_optical_flow(vid_item, dev_id=0):
     flow_x_path = '{}/flow_x'.format(out_full_path)
     flow_y_path = '{}/flow_y'.format(out_full_path)
 
-    cmd = os.path.join(df_path + 'build/extract_gpu')+' -f {} -x {} -y {} -i {} -b 20 -t 1 -d {} -s 1 -o {} -w 340 -h 256'.format(
-        quote(vid_path), quote(flow_x_path), quote(flow_y_path), quote(image_path), dev_id, out_format)
+    cmd = os.path.join(df_path + 'build/extract_gpu')+' -f {} -x {} -y {} -i {} -b 20 -t 1 -d {} -s 1 -o {} -w {} -h {}'.format(
+        quote(vid_path), quote(flow_x_path), quote(flow_y_path), quote(image_path), dev_id, out_format, new_size[0], new_size[1])
 
     os.system(cmd)
     print '{} {} done'.format(vid_id, vid_name)
@@ -90,6 +90,8 @@ if __name__ == '__main__':
     parser.add_argument("--out_format", type=str, default='dir', choices=['dir','zip'],
                         help='path to the dense_flow toolbox')
     parser.add_argument("--ext", type=str, default='avi', choices=['avi','mp4'], help='video file extensions')
+    parser.add_argument("--new_width", type=int, default=0, help='resize image width')
+    parser.add_argument("--new_height", type=int, default=0, help='resize image height')
 
     args = parser.parse_args()
 
@@ -100,6 +102,7 @@ if __name__ == '__main__':
     df_path = args.df_path
     out_format = args.out_format
     ext = args.ext
+    new_size = (args.new_width, args.new_height)
 
     if not os.path.isdir(out_path):
         print "creating folder: "+out_path
