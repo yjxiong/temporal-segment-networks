@@ -61,7 +61,13 @@ def eval_video(video):
     vid = video[0]
 
     video_frame_path = f_info[0][vid]
-    frame_cnt = f_info[1][vid]
+    if args.modality == 'rgb':
+        cnt_indexer = 1
+    elif args.modality == 'flow':
+        cnt_indexer = 2
+    else:
+        raise ValueError(args.modality)
+    frame_cnt = f_info[cnt_indexer][vid]
 
     stack_depth = 0
     if args.modality == 'rgb':
