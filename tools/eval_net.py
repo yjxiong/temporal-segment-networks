@@ -92,7 +92,7 @@ def eval_video(video):
                 y_name = '{}{:05d}.jpg'.format(args.flow_y_prefix, idx)
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, x_name), cv2.IMREAD_GRAYSCALE))
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, y_name), cv2.IMREAD_GRAYSCALE))
-            scores = net.predict_single_flow_stack(np.array(flow_stack), score_name, frame_size=(340, 256))
+            scores = net.predict_single_flow_stack(flow_stack, score_name, frame_size=(340, 256))
             frame_scores.append(scores)
 
     print 'video {} done'.format(vid)

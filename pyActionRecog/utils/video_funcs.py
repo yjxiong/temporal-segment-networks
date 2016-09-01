@@ -5,16 +5,17 @@ import numpy as np
 from metrics import softmax
 
 
-def default_aggregation_func(score_arr, normalization=True):
+def default_aggregation_func(score_arr, normalization=True, crop_agg=None):
     """
     This is the default function for make video-level prediction
     :param score_arr: a 3-dim array with (frame, crop, class) layout
     :return:
     """
+    crop_agg = np.mean if crop_agg is None else crop_agg
     if normalization:
-        return softmax(score_arr.mean(axis=1).mean(axis=0))
+        return softmax(crop_agg(score_arr, axis=1).mean(axis=0))
     else:
-        return score_arr.mean(axis=1).mean(axis=0)
+        return crop_agg(score_arr, axis=1).mean(axis=0)
 
 
 def sliding_window_aggregation_func(score, spans=[1, 2, 4, 8, 16], overlap=0.2, norm=True, fps=1):

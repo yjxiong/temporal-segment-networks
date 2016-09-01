@@ -9,6 +9,7 @@ from pyActionRecog.utils.metrics import mean_class_accuracy
 parser = argparse.ArgumentParser()
 parser.add_argument('score_files', nargs='+', type=str)
 parser.add_argument('--score_weights', nargs='+', type=float, default=None)
+parser.add_argument('--crop_agg', type=str, choices=['max', 'mean'], default='mean')
 args = parser.parse_args()
 
 score_npz_files = [np.load(x) for x in args.score_files]
@@ -29,7 +30,7 @@ label_list = [x['labels'] for x in score_npz_files]
 # score_aggregation
 agg_score_list = []
 for score_vec in score_list:
-    agg_score_vec = [default_aggregation_func(x, normalization=False) for x in score_vec]
+    agg_score_vec = [default_aggregation_func(x, normalization=False, crop_agg=getattr(np, args.crop_agg)) for x in score_vec]
     agg_score_list.append(np.array(agg_score_vec))
 
 final_scores = np.zeros_like(agg_score_list[0])

@@ -32,15 +32,13 @@ def flow_stack_oversample(flow_stack, crop_dims):
     crop_ix = np.tile(crop_ix, (2,1))
 
     crops = np.empty((10, flow_stack.shape[0], crop_dims[0], crop_dims[1]),
-                     dtype=np.float32)
+                     dtype=flow_stack.dtype)
 
     for ix in xrange(10):
         cp = crop_ix[ix]
         crops[ix] = flow_stack[:, cp[0]:cp[2], cp[1]:cp[3]]
-
     crops[5:] = crops[5:, :, :, ::-1]
     crops[5:, range(0, stack_depth, 2), ...] = 255 - crops[5:, range(0, stack_depth, 2), ...]
-
     return crops
 
 
@@ -101,4 +99,22 @@ def rgb_to_parrots(frame, oversample=True, mean_val=None, crop_size=None):
         crops = rgb_oversample(frame, crop_size) - mean_val
         ret_frames = crops.transpose((0, 3, 1, 2))
         return ret_frames
+
+
+def fast_list2arr(data, offset=None, dtype=None):
+    """
+    Convert a list of numpy arrays with the same size to a large numpy array.
+    This is way more efficient than directly using numpy.array()
+    See
+        https://github.com/obspy/obspy/wiki/Known-Python-Issues
+    :param data: [numpy.array]
+    :param offset: array to be subtracted from the each array.
+    :param dtype: data type
+    :return: numpy.array
+    """
+    num = len(data)
+    out_data = np.empty((num,)+data[0].shape, dtype=dtype if dtype else data[0].dtype)
+    for i in xrange(num):
+        out_data[i] = data[i] - offset if offset else data[i]
+    return out_data
 

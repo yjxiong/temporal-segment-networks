@@ -4,7 +4,7 @@ import sys
 import caffe
 from caffe.io import oversample
 import numpy as np
-from utils.io import flow_stack_oversample
+from utils.io import flow_stack_oversample, fast_list2arr
 import cv2
 
 
@@ -46,8 +46,8 @@ class CaffeNet(object):
                     resized_frame = [cv2.resize(x, (0,0), fx=1.0/scale, fy=1.0/scale) for x in frame]
                     os_frame.extend(oversample(resized_frame, (self._sample_shape[2], self._sample_shape[3])))
         else:
-            os_frame = np.array(frame)
-        data = np.array([self._transformer.preprocess('data', x) for x in os_frame])
+            os_frame = fast_list2arr(frame)
+        data = fast_list2arr([self._transformer.preprocess('data', x) for x in os_frame])
 
         self._net.blobs['data'].reshape(*data.shape)
         self._net.reshape()
@@ -57,14 +57,16 @@ class CaffeNet(object):
     def predict_single_flow_stack(self, frame, score_name, over_sample=True, frame_size=None):
 
         if frame_size is not None:
-            frame = np.array([cv2.resize(x, frame_size) for x in frame])
+            frame = fast_list2arr([cv2.resize(x, frame_size) for x in frame])
+        else:
+            frame = fast_list2arr(frame)
 
         if over_sample:
             os_frame = flow_stack_oversample(frame, (self._sample_shape[2], self._sample_shape[3]))
         else:
-            os_frame = np.array([frame])
+            os_frame = fast_list2arr([frame])
 
-        data = os_frame - 128
+        data = os_frame - np.float32(128.0)
 
         self._net.blobs['data'].reshape(*data.shape)
         self._net.reshape()
