@@ -255,7 +255,7 @@ in order to distiguish the learned weights.
 To use more or less GPU, one can change the `N_GPU` in `scripts/train_tsn.sh`.
 **Important notice**: when the GPU number is changed, the effective batchsize is also changed.
 It's better to always make sure the effective batchsize, which equals to `batch_size*iter_size*n_gpu`, to be **256**.
-Here, `batch_size` is the number in the model's prototxt, for example [line 8](bs_line)
+Here, `batch_size` is the number in the model's prototxt, for example [line 9](https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_rgb_train_val.prototxt#L9)
 in `models/ucf101/tsn_bn_inception_rgb_train_val.protoxt`.
  
 #Other Info
