@@ -44,7 +44,7 @@ def run_optical_flow(vid_item, dev_id=0):
         pass
 
     current = current_process()
-    dev_id = int(current._identity[0]) - 1
+    dev_id = (int(current._identity[0]) - 1) % NUM_GPU
     image_path = '{}/img'.format(out_full_path)
     flow_x_path = '{}/flow_x'.format(out_full_path)
     flow_y_path = '{}/flow_y'.format(out_full_path)
@@ -57,6 +57,7 @@ def run_optical_flow(vid_item, dev_id=0):
     sys.stdout.flush()
     return True
 
+
 def run_warp_optical_flow(vid_item, dev_id=0):
     vid_path = vid_item[0]
     vid_id = vid_item[1]
@@ -68,11 +69,12 @@ def run_warp_optical_flow(vid_item, dev_id=0):
         pass
 
     current = current_process()
-    dev_id = int(current._identity[0]) - 1
+    dev_id = (int(current._identity[0]) - 1) % NUM_GPU
     flow_x_path = '{}/flow_x'.format(out_full_path)
     flow_y_path = '{}/flow_y'.format(out_full_path)
 
-    cmd = os.path.join(df_path + 'build/extract_warp_gpu')+' -f {} -x {} -y {} -b 20 -t 1 -d {} -s 1 -o {}'.format(vid_path, flow_x_path, flow_y_path, dev_id, out_format)
+    cmd = os.path.join(df_path + 'build/extract_warp_gpu')+' -f {} -x {} -y {} -b 20 -t 1 -d {} -s 1 -o {}'.format(
+        vid_path, flow_x_path, flow_y_path, dev_id, out_format)
 
     os.system(cmd)
     print 'warp on {} {} done'.format(vid_id, vid_name)
@@ -92,6 +94,7 @@ if __name__ == '__main__':
     parser.add_argument("--ext", type=str, default='avi', choices=['avi','mp4'], help='video file extensions')
     parser.add_argument("--new_width", type=int, default=0, help='resize image width')
     parser.add_argument("--new_height", type=int, default=0, help='resize image height')
+    parser.add_argument("--num_gpu", type=int, default=8, help='number of GPU')
 
     args = parser.parse_args()
 
@@ -103,6 +106,7 @@ if __name__ == '__main__':
     out_format = args.out_format
     ext = args.ext
     new_size = (args.new_width, args.new_height)
+    NUM_GPU = args.num_gpu
 
     if not os.path.isdir(out_path):
         print "creating folder: "+out_path
