@@ -29,6 +29,7 @@ parser.add_argument('--num_frame_per_video', type=int, default=25,
 parser.add_argument('--save_scores', type=str, default=None, help='the filename to save the scores in')
 parser.add_argument('--num_worker', type=int, default=1)
 parser.add_argument("--caffe_path", type=str, default='./lib/caffe-action/', help='path to the caffe toolbox')
+parser.add_argument("--gpus", type=int, nargs='+', default=None, help='specify list of gpu to use')
 args = parser.parse_args()
 
 print args
@@ -42,6 +43,8 @@ split_tp = parse_split_file(args.dataset)
 f_info = parse_directory(args.frame_path,
                          args.rgb_prefix, args.flow_x_prefix, args.flow_y_prefix)
 
+gpu_list = args.gpus
+
 
 eval_video_list = split_tp[args.split - 1][1]
 
@@ -52,7 +55,10 @@ def build_net():
     global net
     my_id = multiprocessing.current_process()._identity[0] \
         if args.num_worker > 1 else 1
-    net = CaffeNet(args.net_proto, args.net_weights, my_id-1)
+    if gpu_list is None:
+        net = CaffeNet(args.net_proto, args.net_weights, my_id-1)
+    else:
+        net = CaffeNet(args.net_proto, args.net_weights, gpu_list[my_id - 1])
 
 
 def eval_video(video):

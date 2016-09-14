@@ -16,9 +16,9 @@ debug_info: false
 base_lr: 0.001
 lr_policy: "step"
 gamma: 0.1
-stepsize: 2000
-max_iter: 4500
-iter_size: 2
+stepsize: 1500
+max_iter: 3500
+iter_size: 1
 
 # parameter of SGD
 momentum: 0.9

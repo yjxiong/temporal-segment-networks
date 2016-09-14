@@ -18,7 +18,7 @@ lr_policy: "multistep"
 gamma: 0.1
 stepvalue: [4000, 6000]
 max_iter: 7000
-iter_size: 2
+iter_size: 1
 
 # parameter of SGD
 momentum: 0.9
