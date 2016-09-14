@@ -85,7 +85,7 @@ The following commands illustrate how to extract the videos.
 ```
 mkdir rars && mkdir videos
 unrar x hmdb51-org.rar rars/
-for a in $(ls rars) do; unrar x $a videos/; done;
+for a in $(ls rars); do unrar x "rars/${a}" videos/; done;
 ```
 
 ### Get trained models
