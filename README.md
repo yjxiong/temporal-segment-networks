@@ -84,7 +84,7 @@ MPI_PREFIX=<root path to openmpi installation> bash build_all.sh MPI_ON
 
 We experimented on two mainstream action recognition datasets: [UCF-101][ucf101] and [HMDB51][hmdb51]. Videos can be downloaded directly from their websites.
 After download, please extract the videos from the `rar` archives.
-- UCF101: the ucf101 videos are archived in the downloaded file. Please use `unrar x UCF-101.rar` to extract the videos.
+- UCF101: the ucf101 videos are archived in the downloaded file. Please use `unrar x UCF101.rar` to extract the videos.
 - HMDB51: the HMDB51 video archive has two-level of packaging.
 The following commands illustrate how to extract the videos.
 ```
