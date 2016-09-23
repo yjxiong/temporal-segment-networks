@@ -32,7 +32,7 @@ Below is the guidance to reproduce the reported results and explore more.
   * [Training Temporal Segment Networks](#training-temporal-segment-networks)
     * [Construct file lists for training and validation](#construct-file-lists-for-training-and-validation)
     * [Get initialization models](#get-initialization-models)
-    * [Kick off training](#kick-off-training)
+    * [Start training](#start-training)
     * [Config the training process](#config-the-training-process)
 * [Other Info](#other-info)
   * [Citation](#citation)
@@ -209,7 +209,7 @@ To download the model weights, run
 bash scripts/get_init_models.sh
 ```
 
-### Kick off training
+### Start training
 [[back to top](#temporal-segment-networks-tsn)]
 
 Once all necessities ready, we can start training TSN.
@@ -219,7 +219,7 @@ For example, the following command runs training on UCF101 with rgb input
 bash scripts/train_tsn.sh ucf101 rgb
 ```
 the training will run with default settings on 4 GPUs.
-Usually, it takes around 2 hours to train the rgb model and 8 hours for flow models, on 4 GTX Titan X GPUs.
+Usually, it takes around 1 hours to train the rgb model and 4 hours for flow models, on 4 GTX Titan X GPUs.
 
 The learned model weights will be saved in `models/`.
 The aforementioned testing process can be used to evaluate them.
@@ -227,7 +227,7 @@ The aforementioned testing process can be used to evaluate them.
 ### Config the training process
 [[back to top](#temporal-segment-networks-tsn)]
 
-Here are some information on customizing the training process
+Here we provide some information on customizing the training process
 - **Change split**: By default, the training is conducted on split 1 of the datasets.
 To change the split, one can modify corresponding model specs and solver files.
 For example, to train on split 2 of UCF101 with rgb input, one can modify the file `models/ucf101/tsn_bn_inception_rgb_train_val.prototxt`.
