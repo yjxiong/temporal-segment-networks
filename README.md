@@ -292,7 +292,7 @@ Please cite the following paper if you feel this repository useful.
 ## Contact
 For any question, please contact
 ```
-Yuanjun Xiong: xy012@ie.cuhk.edu.hk
+Yuanjun Xiong: yjxiong@ie.cuhk.edu.hk
 Limin Wang: lmwang.nju@gmail.com
 ```
 
