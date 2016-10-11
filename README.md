@@ -11,7 +11,7 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 ## News & Updates
 
-Sep 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some paramters in TSN training are affected. 
+Sep 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN training are affected. 
 You are advised to update to the latest version.
 
 ##[FAQ][faq]
