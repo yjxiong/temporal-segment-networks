@@ -11,7 +11,9 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 ## News & Updates
 
-Sep 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN training are affected. 
+Nov. 5, 2016 - The project page for TSN is online. [website][tsn_site]
+
+Sep. 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN training are affected. 
 You are advised to update to the latest version.
 
 ##[FAQ][faq]
@@ -306,4 +308,4 @@ Limin Wang: lmwang.nju@gmail.com
 [faq]:https://github.com/yjxiong/temporal-segment-networks/wiki/Frequently-Asked-Questions
 [bs_line]:https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_flow_train_val.prototxt#L8
 [bug]:https://github.com/yjxiong/caffe/commit/c0d200ba0ed004edcfd387163395be7ea309dbc3
-
+[tsn_site]:http://personal.ie.cuhk.edu.hk/~xy012/others/tsn/
