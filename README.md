@@ -308,4 +308,4 @@ Limin Wang: lmwang.nju@gmail.com
 [faq]:https://github.com/yjxiong/temporal-segment-networks/wiki/Frequently-Asked-Questions
 [bs_line]:https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_flow_train_val.prototxt#L8
 [bug]:https://github.com/yjxiong/caffe/commit/c0d200ba0ed004edcfd387163395be7ea309dbc3
-[tsn_site]:http://personal.ie.cuhk.edu.hk/~xy012/others/tsn/
+[tsn_site]:http://yjxiong.me/others/tsn/
