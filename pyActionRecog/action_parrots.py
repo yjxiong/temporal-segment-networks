@@ -2,12 +2,14 @@ import numpy as np
 import sys
 
 import cv2
-from utils.io import flow_stack_oversample, rgb_to_parrots
+from utils.io import flow_stack_oversample, rgb_to_parrots, fast_list2arr
 import pyparrots.dnn as dnn
+import pyparrots.base as base
 import yaml
 
 
 MAX_BATCHSIZE = 32
+base.set_debug_log(False)
 
 
 class ParrotsNet(object):
@@ -55,27 +57,29 @@ class ParrotsNet(object):
         self._sample_shape = input_shape
         self._channel_mean = [104, 117, 123]
 
-    def predict_rgb_frame_list(self, frame_list, over_sample=True,
+        self._parrots_flow = self._parrots_session.flow("main")
+
+        self._subtract_buffer = np.ones(self._sample_shape, dtype=np.float32) * -128.0
+
+    def predict_single_rgb_frame(self, frame, over_sample=True,
                              multiscale=None, frame_size=None):
 
         if frame_size is not None:
-            frame_list = [cv2.resize(x, frame_size) for x in frame_list]
+            frame = cv2.resize(frame, frame_size)
 
         if over_sample:
             if multiscale is None:
-                os_frame = np.concatenate([rgb_to_parrots(x, mean_val=self._channel_mean,
+                os_frame = rgb_to_parrots(frame, mean_val=self._channel_mean,
                                           crop_size=(self._sample_shape[2], self._sample_shape[3]))
-                                     for x in frame_list], axis=0)
             else:
                 os_frame = []
                 for scale in multiscale:
-                    resized_frame_list = [cv2.resize(x, (0, 0), fx=1.0 / scale, fy=1.0 / scale) for x in frame_list]
-                    os_frame.extend(np.concatenate([rgb_to_parrots(x, mean_val=self._channel_mean,
-                                          crop_size=(self._sample_shape[2], self._sample_shape[3]))
-                                    for x in resized_frame_list]))
+                    resized_frame = cv2.resize(frame, (0, 0), fx=1.0 / scale, fy=1.0 / scale)
+                    os_frame.extend(np.concatenate(rgb_to_parrots(resized_frame, mean_val=self._channel_mean,
+                                          crop_size=(self._sample_shape[2], self._sample_shape[3]))))
                 os_frame = np.concatenate(os_frame, axis=0)
         else:
-            os_frame = rgb_to_parrots(False)
+            os_frame = rgb_to_parrots(frame, False)
 
         bs = self._sample_shape[0]
 
@@ -86,47 +90,26 @@ class ParrotsNet(object):
             step = min(bs, os_frame.shape[0]-offset)
             feed_data[:step, ...] = os_frame[offset:offset+step, ...]
 
-            with self._parrots_session.flow("main") as flow:
-                flow.set_input('data', feed_data.astype(np.float32, order='C'))
-                flow.forward()
-                score_list.append(flow.data(self._score_name).value().T[:step])
+            self._parrots_flow.set_input('data', feed_data.T)
+            self._parrots_flow.forward()
+            score_list.append(self._parrots_flow.data(self._score_name).value().T[:step])
 
-        if over_sample:
-            tmp = np.concatenate(score_list, axis=0)
-            return tmp.reshape((len(os_frame) / 10, 10, score_list[0].shape[-1]))
-        else:
-            return np.concatenate(score_list, axis=0)
+        return np.concatenate(score_list, axis=0)
 
-    def predict_flow_stack_list(self, flow_stack_list, over_sample=True, frame_size=None):
-
+    def predict_single_flow_stack(self, flow_stack, over_sample=True, frame_size=None):
         if frame_size is not None:
-            for i in xrange(len(flow_stack_list)):
-                flow_stack_list[i] = np.array([cv2.resize(x, frame_size) for x in flow_stack_list[i]])
+            flow_stack = fast_list2arr([cv2.resize(x, frame_size) for x in flow_stack], dtype=np.float32)
 
         if over_sample:
-            tmp = [flow_stack_oversample(stack, (self._sample_shape[2], self._sample_shape[3]))
-                                        for stack in flow_stack_list]
-            os_frame = np.concatenate(tmp, axis=0)
+            os_frame = flow_stack_oversample(flow_stack, (self._sample_shape[2], self._sample_shape[3]))
         else:
-            os_frame = np.array(flow_stack_list)
+            os_frame = fast_list2arr([flow_stack])
 
-        os_frame -= 128
+        os_frame = os_frame - self._subtract_buffer
 
-        bs = self._sample_shape[0]
-        feed_data = np.zeros(self._sample_shape)
+        self._parrots_flow.set_input('data', os_frame.T)
 
-        score_list = []
-        for offset in xrange(0, os_frame.shape[0], bs):
-            step = min(bs, os_frame.shape[0] - offset)
-            feed_data[:step, ...] = os_frame[offset:offset + step, ...]
+        self._parrots_flow.forward()
+        score = self._parrots_flow.data(self._score_name).value().T.copy()
 
-            with self._parrots_session.flow("main") as flow:
-                flow.set_input('data', feed_data.astype(np.float32, order='C'))
-                flow.forward()
-                score_list.append(flow.data(self._score_name).value().T[:step])
-
-        if over_sample:
-            tmp = np.concatenate(score_list, axis=0)
-            return tmp.reshape((len(os_frame) / 10, 10, score_list[0].shape[-1]))
-        else:
-            return np.concatenate(score_list, axis=0)
+        return score

@@ -28,10 +28,11 @@ parser.add_argument('--flow_y_prefix', type=str, help="prefix of y direction flo
 parser.add_argument('--num_frame_per_video', type=int, default=25,
                     help="prefix of y direction flow images")
 parser.add_argument('--save_scores', type=str, default=None, help='the filename to save the scores in')
-parser.add_argument('--score_name', type=str, default='fc-action')
+parser.add_argument('--score_name', type=str, default='fc_action')
 parser.add_argument('--num_worker', type=int, default=1)
 parser.add_argument('--max_num_gpu', type=int, default=8)
-parser.add_argument("--parrots_path", type=str, default='/home/yjxiong/Parrots/pyparrots',
+parser.add_argument('--display', type=int, default=1)
+parser.add_argument("--parrots_path", type=str, default='/home/yjxiong/Parrots/parrots/python',
                     help='path to the Parrots toolbox')
 args = parser.parse_args()
 
@@ -44,8 +45,7 @@ from pyActionRecog.action_parrots import ParrotsNet
 def build_net(device_ids=None):
     global net
 
-    my_id = multiprocessing.current_process()._identity[0] \
-        if args.num_worker > 1 else 1
+    my_id = multiprocessing.current_process()._identity[0] if args.num_worker > 1 else 1
 
     if device_ids:
         gpu_id = device_ids[my_id - 1]
@@ -55,7 +55,6 @@ def build_net(device_ids=None):
     net = ParrotsNet(args.parrots_model, args.parrots_weights, gpu_id,
                      10, score_name=args.score_name)
 
-build_net()
 
 # build neccessary information
 print args.dataset
@@ -92,17 +91,14 @@ def eval_video(video):
     assert(len(frame_ticks) == args.num_frame_per_video)
 
     if args.modality == 'rgb':
-        frame_list = []
+        frame_scores = []
         for tick in frame_ticks:
             name = '{}{:05d}.jpg'.format(args.rgb_prefix, tick)
             frame = cv2.imread(os.path.join(video_frame_path, name), cv2.IMREAD_COLOR)
-            frame_list.append(frame)
-
-        # run predication in batches
-        scores = net.predict_rgb_frame_list(frame_list, score_name, frame_size=(340, 256))
+            frame_scores.append(net.predict_single_rgb_frame(frame, score_name, frame_size=(340, 256)))
 
     if args.modality == 'flow':
-        flow_stack_list = []
+        frame_scores = []
         for tick in frame_ticks:
             frame_idx = [min(frame_cnt, tick+offset) for offset in xrange(stack_depth)]
 
@@ -113,13 +109,10 @@ def eval_video(video):
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, x_name), cv2.IMREAD_GRAYSCALE))
                 flow_stack.append(cv2.imread(os.path.join(video_frame_path, y_name), cv2.IMREAD_GRAYSCALE))
 
-            flow_stack_list.append(np.array(flow_stack))
-        # run predication in batches
-        scores = net.predict_flow_stack_list(flow_stack_list, score_name, frame_size=(340, 256))
+            frame_scores.append(net.predict_single_flow_stack(flow_stack, score_name, frame_size=(340, 256)))
 
-    # print 'video {} done'.format(vid)
     sys.stdin.flush()
-    return scores, label, vid
+    return np.array(frame_scores), label, vid
 
 
 def callback(rst):
@@ -127,7 +120,7 @@ def callback(rst):
     eval_rst.append(rst)
     cnt = len(eval_rst)
     if cnt % args.display == 0:
-        cnt_time = time.time()
+        cnt_time = time.time() - proc_start_time
         print 'video {} done, total {}/{}, average {} sec/video'.format(rst[-1], cnt,
                                                                         len(eval_video_list),
                                                                         float(cnt_time) / cnt)
@@ -143,13 +136,15 @@ if args.num_worker > 1:
     pool.join()
 
     rst_dict = {x[-1]:x[:2] for x in eval_rst}
-    video_scores = [rst_dict[v[-1]] for v in eval_video_list]
+    video_scores = [rst_dict[v[0]] for v in eval_video_list]
 else:
     build_net(0)
     eval_rst = []
     for i, v in enumerate(eval_video_list):
         eval_rst.append(eval_video(v))
-        print 'video {} done, total {}/{}'.format(v[-1], i, len(eval_video_list))
+        print 'video {} done, total {}/{}'.format(v[0], i, len(eval_video_list))
+        # print eval_rst[-1][0][0, 0, :]
+
     video_scores = [x[:2] for x in eval_rst]
 
 video_pred = [np.argmax(default_aggregation_func(x[0])) for x in video_scores]

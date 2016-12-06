@@ -1,10 +1,10 @@
 inputs:
-- {id: data, spec: "float32(224, 224, 10, 3, _)"}
+- {id: data, spec: "float32(224, 224, 10, _)"}
 - {id: label, spec: "uint32(1, _)"}
 
 layers:
 - attrs: {kernel_size: 7, num_output: 64, pad: 3, stride: 2}
-  expr: conv1_7x7_s2 = Convolution(data|merge_dim(3,4), @conv1_7x7_s2_0,@conv1_7x7_s2_1)
+  expr: conv1_7x7_s2 = Convolution(data, @conv1_7x7_s2_0,@conv1_7x7_s2_1)
   id: conv1_7x7_s2
 - attrs: {frozen: false}
   expr: conv1_7x7_s2_bn = BN(conv1_7x7_s2, @conv1_7x7_s2_bn_0,@conv1_7x7_s2_bn_1,@conv1_7x7_s2_bn_2)
@@ -571,14 +571,6 @@ layers:
 - attrs: {num_output: 101}
   expr: fc_action = InnerProduct(global_pool, @fc_action_0,@fc_action_1)
   id: fc_action
-- attrs: {kernel_h: 3, kernel_w: 1, mode: ave}
-  expr: fc_pool = Pooling(fc_action|div_dim(1, 3, 1, _))
-  id: fc_pool
-- id: loss
-  expr: "loss = SoftmaxWithLoss(fc_pool, label)"
-- id: accuracy
-  expr: "accuracy = Accuracy(fc_pool | merge_dim(0,1,2), label)"
-
 
 name: BN-Inception_Flow
 params:
