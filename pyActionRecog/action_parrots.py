@@ -4,27 +4,58 @@ import sys
 import cv2
 from utils.io import flow_stack_oversample, rgb_to_parrots
 import pyparrots.dnn as dnn
+import yaml
+
+
+MAX_BATCHSIZE = 32
 
 
 class ParrotsNet(object):
 
-    def __init__(self, parrots_session_file, input_size=None):
+    def __init__(self, model_spec, weights,
+                 device_id=None, batch_size=None,
+                 flow_name='main', session_tmpl='data/parrots_session.tmpl',
+                 score_name='prob', input_name='data', mem_opt=True):
+        session_tmpl = yaml.load(open(session_tmpl))
 
-        self._parrots_runner = dnn.Runner(parrots_session_file, extract=True)
-        self._parrots_runner.setup()
-        self._parrots_session = self._parrots_runner.session
+        if device_id is not None:
+            session_tmpl['flows'][0][flow_name]['devices'] = 'gpu({})'.format(device_id)
 
-        with self._parrots_session.flow('main') as flow:
-            input_shape = flow.get_data_spec('data').shape[::-1]
+        if batch_size is not None:
+            session_tmpl['flows'][0][flow_name]['batch_size'] = batch_size \
+                if batch_size < MAX_BATCHSIZE else MAX_BATCHSIZE
+        else:
+            session_tmpl['flows'][0][flow_name]['batch_size'] = MAX_BATCHSIZE
 
-        if input_size is not None:
-            input_shape = input_shape[:2] + input_size
+        self._parrots_batch_size = session_tmpl['flows'][0][flow_name]['batch_size']
+
+        session_tmpl['flows'][0][flow_name]['spec']['inputs'] = [input_name]
+        session_tmpl['flows'][0][flow_name]['spec']['outputs'] = [score_name]
+
+        self._input_name = input_name
+        self._score_name = score_name
+        self._flow_name = flow_name
+
+        session_tmpl['use_dynamic_memory'] = mem_opt
+
+        ready_session_str = yaml.dump(session_tmpl)
+
+        # create model
+        self._parrots_model = dnn.Model.from_yaml_text(open(model_spec).read())
+
+        self._parrots_session = dnn.Session.from_yaml_text(self._parrots_model, ready_session_str)
+        self._parrots_session.setup()
+
+        # load trained model weights
+        self._parrots_session.flow(self._flow_name).load_param(weights)
+
+        with self._parrots_session.flow(self._flow_name) as flow:
+            input_shape = flow.get_data_spec(self._input_name).shape[::-1]
 
         self._sample_shape = input_shape
         self._channel_mean = [104, 117, 123]
 
-    def predict_rgb_frame_list(self, frame_list,
-                             score_name, over_sample=True,
+    def predict_rgb_frame_list(self, frame_list, over_sample=True,
                              multiscale=None, frame_size=None):
 
         if frame_size is not None:
@@ -58,7 +89,7 @@ class ParrotsNet(object):
             with self._parrots_session.flow("main") as flow:
                 flow.set_input('data', feed_data.astype(np.float32, order='C'))
                 flow.forward()
-                score_list.append(flow.data(score_name).value().T[:step])
+                score_list.append(flow.data(self._score_name).value().T[:step])
 
         if over_sample:
             tmp = np.concatenate(score_list, axis=0)
@@ -66,7 +97,7 @@ class ParrotsNet(object):
         else:
             return np.concatenate(score_list, axis=0)
 
-    def predict_flow_stack_list(self, flow_stack_list, score_name, over_sample=True, frame_size=None):
+    def predict_flow_stack_list(self, flow_stack_list, over_sample=True, frame_size=None):
 
         if frame_size is not None:
             for i in xrange(len(flow_stack_list)):
@@ -92,7 +123,7 @@ class ParrotsNet(object):
             with self._parrots_session.flow("main") as flow:
                 flow.set_input('data', feed_data.astype(np.float32, order='C'))
                 flow.forward()
-                score_list.append(flow.data(score_name).value().T[:step])
+                score_list.append(flow.data(self._score_name).value().T[:step])
 
         if over_sample:
             tmp = np.concatenate(score_list, axis=0)

@@ -1,0 +1,77 @@
+model: 
+    yaml: "models_parrots/ucf101/tsn_bn_inception_rgb_model.yaml"
+load_from: "models_parrots/bn_inception_rgb_init.parrots"
+snapshot_interval: 3500
+work_dir: models/
+init_missing: true
+scheme:
+    max_iter: 3500
+    epoch:
+      - flow: train
+        iter_num: 500
+        log_interval: 20
+        log_outputs: [loss, accuracy]
+      - flow: val
+        iter_num: 19
+        log_outputs: [loss, accuracy]
+flows:
+    - train:
+        spec:
+            inputs: [data, label]
+            outputs: [loss, accuracy]
+            losses: [loss]
+        batch_size: 128
+        devices: gpu(0:8)
+        learn:
+            lr: 0.001
+            weight_decay: 0.0005
+            lr_policy: step(0.1, 1500)
+            updater:
+                type: sgd
+                momentum: 0.9
+
+        feeder:
+            type: pipeline
+            num_thread: 16
+            pipeline:
+                - {expr: "data, label = video_data()",
+                    attr: {listfile: "data/ucf101_rgb_train_split_1.txt",
+                           shuffle: true,
+                           num_segments: 3,
+                           snippet_len: 1,
+                           name_pattern: "img_%05d.jpg" } }
+                - {expr: data = decode(data) }
+                - {expr: data = crop(data),
+                    attr: {mode: multi_scale_size,
+                           size_ratios: [1, .875, .75, .66,],
+                           fix_corner: true, max_distort: 1} }
+                - {expr: data = flip(data), attr: {flow_field: false}}
+                - {expr: data = resize(data), attr: {size: 224 } }
+                - {expr: data = scaleOffset(data), attr: {offset: [104, 117, 123]} }
+                - {expr: data = grouping(data), attr: {group_size: 3, merge_dim: false}}
+    - val:
+        spec:
+            inputs: [data, label]
+            outputs: [loss, accuracy]
+            losses: [loss]
+        batch_size: 200
+        devices: gpu(0:8)
+        feeder:
+            num_thread: 16
+            pipeline:
+                - {expr: "data, label = video_data()",
+                    attr: {listfile: "data/ucf101_rgb_val_split_1.txt",
+                           num_segments: 3,
+                           snippet_len: 1,
+                           name_pattern: "img_%05d.jpg" } }
+                - {expr: data = decode(data) }
+#                - {expr: data = resize(data), attr: {size: 256 } }
+                - {expr: data = crop(data), attr: {crop_size: 224 } }
+                - {expr: data = scaleOffset(data), attr: {offset: [104, 117, 123]} }
+                - {expr: data = grouping(data), attr: {group_size: 3, merge_dim: false}}
+extra:
+  best_snapshot:
+    val_flow: val
+    field: accuracy
+    factor: -1
+    save_instantly: true

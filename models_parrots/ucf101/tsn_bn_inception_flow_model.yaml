@@ -1,0 +1,1140 @@
+inputs:
+- {id: data, spec: "float32(224, 224, 10, 3, _)"}
+- {id: label, spec: "uint32(1, _)"}
+
+layers:
+- attrs: {kernel_size: 7, num_output: 64, pad: 3, stride: 2}
+  expr: conv1_7x7_s2 = Convolution(data|merge_dim(3,4), @conv1_7x7_s2_0,@conv1_7x7_s2_1)
+  id: conv1_7x7_s2
+- attrs: {frozen: false}
+  expr: conv1_7x7_s2_bn = BN(conv1_7x7_s2, @conv1_7x7_s2_bn_0,@conv1_7x7_s2_bn_1,@conv1_7x7_s2_bn_2)
+  id: conv1_7x7_s2_bn
+- {expr: conv1_7x7_s2_bn = ReLU(conv1_7x7_s2_bn), id: conv1_relu_7x7}
+- attrs: {kernel_size: 3, mode: max, stride: 2}
+  expr: pool1_3x3_s2 = Pooling(conv1_7x7_s2_bn)
+  id: pool1_3x3_s2
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: conv2_3x3_reduce = Convolution(pool1_3x3_s2, @conv2_3x3_reduce_0,@conv2_3x3_reduce_1)
+  id: conv2_3x3_reduce
+- attrs: {frozen: true}
+  expr: conv2_3x3_reduce_bn = BN(conv2_3x3_reduce, @conv2_3x3_reduce_bn_0,@conv2_3x3_reduce_bn_1,@conv2_3x3_reduce_bn_2)
+  id: conv2_3x3_reduce_bn
+- {expr: conv2_3x3_reduce_bn = ReLU(conv2_3x3_reduce_bn), id: conv2_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 192, pad: 1}
+  expr: conv2_3x3 = Convolution(conv2_3x3_reduce_bn, @conv2_3x3_0,@conv2_3x3_1)
+  id: conv2_3x3
+- attrs: {frozen: true}
+  expr: conv2_3x3_bn = BN(conv2_3x3, @conv2_3x3_bn_0,@conv2_3x3_bn_1,@conv2_3x3_bn_2)
+  id: conv2_3x3_bn
+- {expr: conv2_3x3_bn = ReLU(conv2_3x3_bn), id: conv2_relu_3x3}
+- attrs: {kernel_size: 3, mode: max, stride: 2}
+  expr: pool2_3x3_s2 = Pooling(conv2_3x3_bn)
+  id: pool2_3x3_s2
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3a_1x1 = Convolution(pool2_3x3_s2, @inception_3a_1x1_0,@inception_3a_1x1_1)
+  id: inception_3a_1x1
+- attrs: {frozen: true}
+  expr: inception_3a_1x1_bn = BN(inception_3a_1x1, @inception_3a_1x1_bn_0,@inception_3a_1x1_bn_1,@inception_3a_1x1_bn_2)
+  id: inception_3a_1x1_bn
+- {expr: inception_3a_1x1_bn = ReLU(inception_3a_1x1_bn), id: inception_3a_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3a_3x3_reduce = Convolution(pool2_3x3_s2, @inception_3a_3x3_reduce_0,@inception_3a_3x3_reduce_1)
+  id: inception_3a_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_3a_3x3_reduce_bn = BN(inception_3a_3x3_reduce, @inception_3a_3x3_reduce_bn_0,@inception_3a_3x3_reduce_bn_1,@inception_3a_3x3_reduce_bn_2)
+  id: inception_3a_3x3_reduce_bn
+- {expr: inception_3a_3x3_reduce_bn = ReLU(inception_3a_3x3_reduce_bn), id: inception_3a_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 64, pad: 1}
+  expr: inception_3a_3x3 = Convolution(inception_3a_3x3_reduce_bn, @inception_3a_3x3_0,@inception_3a_3x3_1)
+  id: inception_3a_3x3
+- attrs: {frozen: true}
+  expr: inception_3a_3x3_bn = BN(inception_3a_3x3, @inception_3a_3x3_bn_0,@inception_3a_3x3_bn_1,@inception_3a_3x3_bn_2)
+  id: inception_3a_3x3_bn
+- {expr: inception_3a_3x3_bn = ReLU(inception_3a_3x3_bn), id: inception_3a_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3a_double_3x3_reduce = Convolution(pool2_3x3_s2, @inception_3a_double_3x3_reduce_0,@inception_3a_double_3x3_reduce_1)
+  id: inception_3a_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_3a_double_3x3_reduce_bn = BN(inception_3a_double_3x3_reduce, @inception_3a_double_3x3_reduce_bn_0,@inception_3a_double_3x3_reduce_bn_1,@inception_3a_double_3x3_reduce_bn_2)
+  id: inception_3a_double_3x3_reduce_bn
+- {expr: inception_3a_double_3x3_reduce_bn = ReLU(inception_3a_double_3x3_reduce_bn),
+  id: inception_3a_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_3a_double_3x3_1 = Convolution(inception_3a_double_3x3_reduce_bn,
+    @inception_3a_double_3x3_1_0,@inception_3a_double_3x3_1_1)
+  id: inception_3a_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_3a_double_3x3_1_bn = BN(inception_3a_double_3x3_1, @inception_3a_double_3x3_1_bn_0,@inception_3a_double_3x3_1_bn_1,@inception_3a_double_3x3_1_bn_2)
+  id: inception_3a_double_3x3_1_bn
+- {expr: inception_3a_double_3x3_1_bn = ReLU(inception_3a_double_3x3_1_bn), id: inception_3a_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_3a_double_3x3_2 = Convolution(inception_3a_double_3x3_1_bn, @inception_3a_double_3x3_2_0,@inception_3a_double_3x3_2_1)
+  id: inception_3a_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_3a_double_3x3_2_bn = BN(inception_3a_double_3x3_2, @inception_3a_double_3x3_2_bn_0,@inception_3a_double_3x3_2_bn_1,@inception_3a_double_3x3_2_bn_2)
+  id: inception_3a_double_3x3_2_bn
+- {expr: inception_3a_double_3x3_2_bn = ReLU(inception_3a_double_3x3_2_bn), id: inception_3a_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_3a_pool = Pooling(pool2_3x3_s2)
+  id: inception_3a_pool
+- attrs: {kernel_size: 1, num_output: 32}
+  expr: inception_3a_pool_proj = Convolution(inception_3a_pool, @inception_3a_pool_proj_0,@inception_3a_pool_proj_1)
+  id: inception_3a_pool_proj
+- attrs: {frozen: true}
+  expr: inception_3a_pool_proj_bn = BN(inception_3a_pool_proj, @inception_3a_pool_proj_bn_0,@inception_3a_pool_proj_bn_1,@inception_3a_pool_proj_bn_2)
+  id: inception_3a_pool_proj_bn
+- {expr: inception_3a_pool_proj_bn = ReLU(inception_3a_pool_proj_bn), id: inception_3a_relu_pool_proj}
+- {expr: 'inception_3a_output = Concat(inception_3a_1x1_bn,inception_3a_3x3_bn,inception_3a_double_3x3_2_bn,inception_3a_pool_proj_bn)',
+  id: inception_3a_output}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3b_1x1 = Convolution(inception_3a_output, @inception_3b_1x1_0,@inception_3b_1x1_1)
+  id: inception_3b_1x1
+- attrs: {frozen: true}
+  expr: inception_3b_1x1_bn = BN(inception_3b_1x1, @inception_3b_1x1_bn_0,@inception_3b_1x1_bn_1,@inception_3b_1x1_bn_2)
+  id: inception_3b_1x1_bn
+- {expr: inception_3b_1x1_bn = ReLU(inception_3b_1x1_bn), id: inception_3b_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3b_3x3_reduce = Convolution(inception_3a_output, @inception_3b_3x3_reduce_0,@inception_3b_3x3_reduce_1)
+  id: inception_3b_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_3b_3x3_reduce_bn = BN(inception_3b_3x3_reduce, @inception_3b_3x3_reduce_bn_0,@inception_3b_3x3_reduce_bn_1,@inception_3b_3x3_reduce_bn_2)
+  id: inception_3b_3x3_reduce_bn
+- {expr: inception_3b_3x3_reduce_bn = ReLU(inception_3b_3x3_reduce_bn), id: inception_3b_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_3b_3x3 = Convolution(inception_3b_3x3_reduce_bn, @inception_3b_3x3_0,@inception_3b_3x3_1)
+  id: inception_3b_3x3
+- attrs: {frozen: true}
+  expr: inception_3b_3x3_bn = BN(inception_3b_3x3, @inception_3b_3x3_bn_0,@inception_3b_3x3_bn_1,@inception_3b_3x3_bn_2)
+  id: inception_3b_3x3_bn
+- {expr: inception_3b_3x3_bn = ReLU(inception_3b_3x3_bn), id: inception_3b_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3b_double_3x3_reduce = Convolution(inception_3a_output, @inception_3b_double_3x3_reduce_0,@inception_3b_double_3x3_reduce_1)
+  id: inception_3b_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_3b_double_3x3_reduce_bn = BN(inception_3b_double_3x3_reduce, @inception_3b_double_3x3_reduce_bn_0,@inception_3b_double_3x3_reduce_bn_1,@inception_3b_double_3x3_reduce_bn_2)
+  id: inception_3b_double_3x3_reduce_bn
+- {expr: inception_3b_double_3x3_reduce_bn = ReLU(inception_3b_double_3x3_reduce_bn),
+  id: inception_3b_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_3b_double_3x3_1 = Convolution(inception_3b_double_3x3_reduce_bn,
+    @inception_3b_double_3x3_1_0,@inception_3b_double_3x3_1_1)
+  id: inception_3b_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_3b_double_3x3_1_bn = BN(inception_3b_double_3x3_1, @inception_3b_double_3x3_1_bn_0,@inception_3b_double_3x3_1_bn_1,@inception_3b_double_3x3_1_bn_2)
+  id: inception_3b_double_3x3_1_bn
+- {expr: inception_3b_double_3x3_1_bn = ReLU(inception_3b_double_3x3_1_bn), id: inception_3b_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_3b_double_3x3_2 = Convolution(inception_3b_double_3x3_1_bn, @inception_3b_double_3x3_2_0,@inception_3b_double_3x3_2_1)
+  id: inception_3b_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_3b_double_3x3_2_bn = BN(inception_3b_double_3x3_2, @inception_3b_double_3x3_2_bn_0,@inception_3b_double_3x3_2_bn_1,@inception_3b_double_3x3_2_bn_2)
+  id: inception_3b_double_3x3_2_bn
+- {expr: inception_3b_double_3x3_2_bn = ReLU(inception_3b_double_3x3_2_bn), id: inception_3b_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_3b_pool = Pooling(inception_3a_output)
+  id: inception_3b_pool
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3b_pool_proj = Convolution(inception_3b_pool, @inception_3b_pool_proj_0,@inception_3b_pool_proj_1)
+  id: inception_3b_pool_proj
+- attrs: {frozen: true}
+  expr: inception_3b_pool_proj_bn = BN(inception_3b_pool_proj, @inception_3b_pool_proj_bn_0,@inception_3b_pool_proj_bn_1,@inception_3b_pool_proj_bn_2)
+  id: inception_3b_pool_proj_bn
+- {expr: inception_3b_pool_proj_bn = ReLU(inception_3b_pool_proj_bn), id: inception_3b_relu_pool_proj}
+- {expr: 'inception_3b_output = Concat(inception_3b_1x1_bn,inception_3b_3x3_bn,inception_3b_double_3x3_2_bn,inception_3b_pool_proj_bn)',
+  id: inception_3b_output}
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_3c_3x3_reduce = Convolution(inception_3b_output, @inception_3c_3x3_reduce_0,@inception_3c_3x3_reduce_1)
+  id: inception_3c_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_3c_3x3_reduce_bn = BN(inception_3c_3x3_reduce, @inception_3c_3x3_reduce_bn_0,@inception_3c_3x3_reduce_bn_1,@inception_3c_3x3_reduce_bn_2)
+  id: inception_3c_3x3_reduce_bn
+- {expr: inception_3c_3x3_reduce_bn = ReLU(inception_3c_3x3_reduce_bn), id: inception_3c_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 160, pad: 1, stride: 2}
+  expr: inception_3c_3x3 = Convolution(inception_3c_3x3_reduce_bn, @inception_3c_3x3_0,@inception_3c_3x3_1)
+  id: inception_3c_3x3
+- attrs: {frozen: true}
+  expr: inception_3c_3x3_bn = BN(inception_3c_3x3, @inception_3c_3x3_bn_0,@inception_3c_3x3_bn_1,@inception_3c_3x3_bn_2)
+  id: inception_3c_3x3_bn
+- {expr: inception_3c_3x3_bn = ReLU(inception_3c_3x3_bn), id: inception_3c_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_3c_double_3x3_reduce = Convolution(inception_3b_output, @inception_3c_double_3x3_reduce_0,@inception_3c_double_3x3_reduce_1)
+  id: inception_3c_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_3c_double_3x3_reduce_bn = BN(inception_3c_double_3x3_reduce, @inception_3c_double_3x3_reduce_bn_0,@inception_3c_double_3x3_reduce_bn_1,@inception_3c_double_3x3_reduce_bn_2)
+  id: inception_3c_double_3x3_reduce_bn
+- {expr: inception_3c_double_3x3_reduce_bn = ReLU(inception_3c_double_3x3_reduce_bn),
+  id: inception_3c_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_3c_double_3x3_1 = Convolution(inception_3c_double_3x3_reduce_bn,
+    @inception_3c_double_3x3_1_0,@inception_3c_double_3x3_1_1)
+  id: inception_3c_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_3c_double_3x3_1_bn = BN(inception_3c_double_3x3_1, @inception_3c_double_3x3_1_bn_0,@inception_3c_double_3x3_1_bn_1,@inception_3c_double_3x3_1_bn_2)
+  id: inception_3c_double_3x3_1_bn
+- {expr: inception_3c_double_3x3_1_bn = ReLU(inception_3c_double_3x3_1_bn), id: inception_3c_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1, stride: 2}
+  expr: inception_3c_double_3x3_2 = Convolution(inception_3c_double_3x3_1_bn, @inception_3c_double_3x3_2_0,@inception_3c_double_3x3_2_1)
+  id: inception_3c_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_3c_double_3x3_2_bn = BN(inception_3c_double_3x3_2, @inception_3c_double_3x3_2_bn_0,@inception_3c_double_3x3_2_bn_1,@inception_3c_double_3x3_2_bn_2)
+  id: inception_3c_double_3x3_2_bn
+- {expr: inception_3c_double_3x3_2_bn = ReLU(inception_3c_double_3x3_2_bn), id: inception_3c_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: max, stride: 2}
+  expr: inception_3c_pool = Pooling(inception_3b_output)
+  id: inception_3c_pool
+- {expr: 'inception_3c_output = Concat(inception_3c_3x3_bn,inception_3c_double_3x3_2_bn,inception_3c_pool)',
+  id: inception_3c_output}
+- attrs: {kernel_size: 1, num_output: 224}
+  expr: inception_4a_1x1 = Convolution(inception_3c_output, @inception_4a_1x1_0,@inception_4a_1x1_1)
+  id: inception_4a_1x1
+- attrs: {frozen: true}
+  expr: inception_4a_1x1_bn = BN(inception_4a_1x1, @inception_4a_1x1_bn_0,@inception_4a_1x1_bn_1,@inception_4a_1x1_bn_2)
+  id: inception_4a_1x1_bn
+- {expr: inception_4a_1x1_bn = ReLU(inception_4a_1x1_bn), id: inception_4a_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 64}
+  expr: inception_4a_3x3_reduce = Convolution(inception_3c_output, @inception_4a_3x3_reduce_0,@inception_4a_3x3_reduce_1)
+  id: inception_4a_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4a_3x3_reduce_bn = BN(inception_4a_3x3_reduce, @inception_4a_3x3_reduce_bn_0,@inception_4a_3x3_reduce_bn_1,@inception_4a_3x3_reduce_bn_2)
+  id: inception_4a_3x3_reduce_bn
+- {expr: inception_4a_3x3_reduce_bn = ReLU(inception_4a_3x3_reduce_bn), id: inception_4a_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 96, pad: 1}
+  expr: inception_4a_3x3 = Convolution(inception_4a_3x3_reduce_bn, @inception_4a_3x3_0,@inception_4a_3x3_1)
+  id: inception_4a_3x3
+- attrs: {frozen: true}
+  expr: inception_4a_3x3_bn = BN(inception_4a_3x3, @inception_4a_3x3_bn_0,@inception_4a_3x3_bn_1,@inception_4a_3x3_bn_2)
+  id: inception_4a_3x3_bn
+- {expr: inception_4a_3x3_bn = ReLU(inception_4a_3x3_bn), id: inception_4a_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 96}
+  expr: inception_4a_double_3x3_reduce = Convolution(inception_3c_output, @inception_4a_double_3x3_reduce_0,@inception_4a_double_3x3_reduce_1)
+  id: inception_4a_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4a_double_3x3_reduce_bn = BN(inception_4a_double_3x3_reduce, @inception_4a_double_3x3_reduce_bn_0,@inception_4a_double_3x3_reduce_bn_1,@inception_4a_double_3x3_reduce_bn_2)
+  id: inception_4a_double_3x3_reduce_bn
+- {expr: inception_4a_double_3x3_reduce_bn = ReLU(inception_4a_double_3x3_reduce_bn),
+  id: inception_4a_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 128, pad: 1}
+  expr: inception_4a_double_3x3_1 = Convolution(inception_4a_double_3x3_reduce_bn,
+    @inception_4a_double_3x3_1_0,@inception_4a_double_3x3_1_1)
+  id: inception_4a_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_4a_double_3x3_1_bn = BN(inception_4a_double_3x3_1, @inception_4a_double_3x3_1_bn_0,@inception_4a_double_3x3_1_bn_1,@inception_4a_double_3x3_1_bn_2)
+  id: inception_4a_double_3x3_1_bn
+- {expr: inception_4a_double_3x3_1_bn = ReLU(inception_4a_double_3x3_1_bn), id: inception_4a_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 128, pad: 1}
+  expr: inception_4a_double_3x3_2 = Convolution(inception_4a_double_3x3_1_bn, @inception_4a_double_3x3_2_0,@inception_4a_double_3x3_2_1)
+  id: inception_4a_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_4a_double_3x3_2_bn = BN(inception_4a_double_3x3_2, @inception_4a_double_3x3_2_bn_0,@inception_4a_double_3x3_2_bn_1,@inception_4a_double_3x3_2_bn_2)
+  id: inception_4a_double_3x3_2_bn
+- {expr: inception_4a_double_3x3_2_bn = ReLU(inception_4a_double_3x3_2_bn), id: inception_4a_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_4a_pool = Pooling(inception_3c_output)
+  id: inception_4a_pool
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4a_pool_proj = Convolution(inception_4a_pool, @inception_4a_pool_proj_0,@inception_4a_pool_proj_1)
+  id: inception_4a_pool_proj
+- attrs: {frozen: true}
+  expr: inception_4a_pool_proj_bn = BN(inception_4a_pool_proj, @inception_4a_pool_proj_bn_0,@inception_4a_pool_proj_bn_1,@inception_4a_pool_proj_bn_2)
+  id: inception_4a_pool_proj_bn
+- {expr: inception_4a_pool_proj_bn = ReLU(inception_4a_pool_proj_bn), id: inception_4a_relu_pool_proj}
+- {expr: 'inception_4a_output = Concat(inception_4a_1x1_bn,inception_4a_3x3_bn,inception_4a_double_3x3_2_bn,inception_4a_pool_proj_bn)',
+  id: inception_4a_output}
+- attrs: {kernel_size: 1, num_output: 192}
+  expr: inception_4b_1x1 = Convolution(inception_4a_output, @inception_4b_1x1_0,@inception_4b_1x1_1)
+  id: inception_4b_1x1
+- attrs: {frozen: true}
+  expr: inception_4b_1x1_bn = BN(inception_4b_1x1, @inception_4b_1x1_bn_0,@inception_4b_1x1_bn_1,@inception_4b_1x1_bn_2)
+  id: inception_4b_1x1_bn
+- {expr: inception_4b_1x1_bn = ReLU(inception_4b_1x1_bn), id: inception_4b_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 96}
+  expr: inception_4b_3x3_reduce = Convolution(inception_4a_output, @inception_4b_3x3_reduce_0,@inception_4b_3x3_reduce_1)
+  id: inception_4b_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4b_3x3_reduce_bn = BN(inception_4b_3x3_reduce, @inception_4b_3x3_reduce_bn_0,@inception_4b_3x3_reduce_bn_1,@inception_4b_3x3_reduce_bn_2)
+  id: inception_4b_3x3_reduce_bn
+- {expr: inception_4b_3x3_reduce_bn = ReLU(inception_4b_3x3_reduce_bn), id: inception_4b_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 128, pad: 1}
+  expr: inception_4b_3x3 = Convolution(inception_4b_3x3_reduce_bn, @inception_4b_3x3_0,@inception_4b_3x3_1)
+  id: inception_4b_3x3
+- attrs: {frozen: true}
+  expr: inception_4b_3x3_bn = BN(inception_4b_3x3, @inception_4b_3x3_bn_0,@inception_4b_3x3_bn_1,@inception_4b_3x3_bn_2)
+  id: inception_4b_3x3_bn
+- {expr: inception_4b_3x3_bn = ReLU(inception_4b_3x3_bn), id: inception_4b_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 96}
+  expr: inception_4b_double_3x3_reduce = Convolution(inception_4a_output, @inception_4b_double_3x3_reduce_0,@inception_4b_double_3x3_reduce_1)
+  id: inception_4b_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4b_double_3x3_reduce_bn = BN(inception_4b_double_3x3_reduce, @inception_4b_double_3x3_reduce_bn_0,@inception_4b_double_3x3_reduce_bn_1,@inception_4b_double_3x3_reduce_bn_2)
+  id: inception_4b_double_3x3_reduce_bn
+- {expr: inception_4b_double_3x3_reduce_bn = ReLU(inception_4b_double_3x3_reduce_bn),
+  id: inception_4b_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 128, pad: 1}
+  expr: inception_4b_double_3x3_1 = Convolution(inception_4b_double_3x3_reduce_bn,
+    @inception_4b_double_3x3_1_0,@inception_4b_double_3x3_1_1)
+  id: inception_4b_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_4b_double_3x3_1_bn = BN(inception_4b_double_3x3_1, @inception_4b_double_3x3_1_bn_0,@inception_4b_double_3x3_1_bn_1,@inception_4b_double_3x3_1_bn_2)
+  id: inception_4b_double_3x3_1_bn
+- {expr: inception_4b_double_3x3_1_bn = ReLU(inception_4b_double_3x3_1_bn), id: inception_4b_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 128, pad: 1}
+  expr: inception_4b_double_3x3_2 = Convolution(inception_4b_double_3x3_1_bn, @inception_4b_double_3x3_2_0,@inception_4b_double_3x3_2_1)
+  id: inception_4b_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_4b_double_3x3_2_bn = BN(inception_4b_double_3x3_2, @inception_4b_double_3x3_2_bn_0,@inception_4b_double_3x3_2_bn_1,@inception_4b_double_3x3_2_bn_2)
+  id: inception_4b_double_3x3_2_bn
+- {expr: inception_4b_double_3x3_2_bn = ReLU(inception_4b_double_3x3_2_bn), id: inception_4b_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_4b_pool = Pooling(inception_4a_output)
+  id: inception_4b_pool
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4b_pool_proj = Convolution(inception_4b_pool, @inception_4b_pool_proj_0,@inception_4b_pool_proj_1)
+  id: inception_4b_pool_proj
+- attrs: {frozen: true}
+  expr: inception_4b_pool_proj_bn = BN(inception_4b_pool_proj, @inception_4b_pool_proj_bn_0,@inception_4b_pool_proj_bn_1,@inception_4b_pool_proj_bn_2)
+  id: inception_4b_pool_proj_bn
+- {expr: inception_4b_pool_proj_bn = ReLU(inception_4b_pool_proj_bn), id: inception_4b_relu_pool_proj}
+- {expr: 'inception_4b_output = Concat(inception_4b_1x1_bn,inception_4b_3x3_bn,inception_4b_double_3x3_2_bn,inception_4b_pool_proj_bn)',
+  id: inception_4b_output}
+- attrs: {kernel_size: 1, num_output: 160}
+  expr: inception_4c_1x1 = Convolution(inception_4b_output, @inception_4c_1x1_0,@inception_4c_1x1_1)
+  id: inception_4c_1x1
+- attrs: {frozen: true}
+  expr: inception_4c_1x1_bn = BN(inception_4c_1x1, @inception_4c_1x1_bn_0,@inception_4c_1x1_bn_1,@inception_4c_1x1_bn_2)
+  id: inception_4c_1x1_bn
+- {expr: inception_4c_1x1_bn = ReLU(inception_4c_1x1_bn), id: inception_4c_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4c_3x3_reduce = Convolution(inception_4b_output, @inception_4c_3x3_reduce_0,@inception_4c_3x3_reduce_1)
+  id: inception_4c_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4c_3x3_reduce_bn = BN(inception_4c_3x3_reduce, @inception_4c_3x3_reduce_bn_0,@inception_4c_3x3_reduce_bn_1,@inception_4c_3x3_reduce_bn_2)
+  id: inception_4c_3x3_reduce_bn
+- {expr: inception_4c_3x3_reduce_bn = ReLU(inception_4c_3x3_reduce_bn), id: inception_4c_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 160, pad: 1}
+  expr: inception_4c_3x3 = Convolution(inception_4c_3x3_reduce_bn, @inception_4c_3x3_0,@inception_4c_3x3_1)
+  id: inception_4c_3x3
+- attrs: {frozen: true}
+  expr: inception_4c_3x3_bn = BN(inception_4c_3x3, @inception_4c_3x3_bn_0,@inception_4c_3x3_bn_1,@inception_4c_3x3_bn_2)
+  id: inception_4c_3x3_bn
+- {expr: inception_4c_3x3_bn = ReLU(inception_4c_3x3_bn), id: inception_4c_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4c_double_3x3_reduce = Convolution(inception_4b_output, @inception_4c_double_3x3_reduce_0,@inception_4c_double_3x3_reduce_1)
+  id: inception_4c_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4c_double_3x3_reduce_bn = BN(inception_4c_double_3x3_reduce, @inception_4c_double_3x3_reduce_bn_0,@inception_4c_double_3x3_reduce_bn_1,@inception_4c_double_3x3_reduce_bn_2)
+  id: inception_4c_double_3x3_reduce_bn
+- {expr: inception_4c_double_3x3_reduce_bn = ReLU(inception_4c_double_3x3_reduce_bn),
+  id: inception_4c_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 160, pad: 1}
+  expr: inception_4c_double_3x3_1 = Convolution(inception_4c_double_3x3_reduce_bn,
+    @inception_4c_double_3x3_1_0,@inception_4c_double_3x3_1_1)
+  id: inception_4c_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_4c_double_3x3_1_bn = BN(inception_4c_double_3x3_1, @inception_4c_double_3x3_1_bn_0,@inception_4c_double_3x3_1_bn_1,@inception_4c_double_3x3_1_bn_2)
+  id: inception_4c_double_3x3_1_bn
+- {expr: inception_4c_double_3x3_1_bn = ReLU(inception_4c_double_3x3_1_bn), id: inception_4c_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 160, pad: 1}
+  expr: inception_4c_double_3x3_2 = Convolution(inception_4c_double_3x3_1_bn, @inception_4c_double_3x3_2_0,@inception_4c_double_3x3_2_1)
+  id: inception_4c_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_4c_double_3x3_2_bn = BN(inception_4c_double_3x3_2, @inception_4c_double_3x3_2_bn_0,@inception_4c_double_3x3_2_bn_1,@inception_4c_double_3x3_2_bn_2)
+  id: inception_4c_double_3x3_2_bn
+- {expr: inception_4c_double_3x3_2_bn = ReLU(inception_4c_double_3x3_2_bn), id: inception_4c_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_4c_pool = Pooling(inception_4b_output)
+  id: inception_4c_pool
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4c_pool_proj = Convolution(inception_4c_pool, @inception_4c_pool_proj_0,@inception_4c_pool_proj_1)
+  id: inception_4c_pool_proj
+- attrs: {frozen: true}
+  expr: inception_4c_pool_proj_bn = BN(inception_4c_pool_proj, @inception_4c_pool_proj_bn_0,@inception_4c_pool_proj_bn_1,@inception_4c_pool_proj_bn_2)
+  id: inception_4c_pool_proj_bn
+- {expr: inception_4c_pool_proj_bn = ReLU(inception_4c_pool_proj_bn), id: inception_4c_relu_pool_proj}
+- {expr: 'inception_4c_output = Concat(inception_4c_1x1_bn,inception_4c_3x3_bn,inception_4c_double_3x3_2_bn,inception_4c_pool_proj_bn)',
+  id: inception_4c_output}
+- attrs: {kernel_size: 1, num_output: 96}
+  expr: inception_4d_1x1 = Convolution(inception_4c_output, @inception_4d_1x1_0,@inception_4d_1x1_1)
+  id: inception_4d_1x1
+- attrs: {frozen: true}
+  expr: inception_4d_1x1_bn = BN(inception_4d_1x1, @inception_4d_1x1_bn_0,@inception_4d_1x1_bn_1,@inception_4d_1x1_bn_2)
+  id: inception_4d_1x1_bn
+- {expr: inception_4d_1x1_bn = ReLU(inception_4d_1x1_bn), id: inception_4d_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4d_3x3_reduce = Convolution(inception_4c_output, @inception_4d_3x3_reduce_0,@inception_4d_3x3_reduce_1)
+  id: inception_4d_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4d_3x3_reduce_bn = BN(inception_4d_3x3_reduce, @inception_4d_3x3_reduce_bn_0,@inception_4d_3x3_reduce_bn_1,@inception_4d_3x3_reduce_bn_2)
+  id: inception_4d_3x3_reduce_bn
+- {expr: inception_4d_3x3_reduce_bn = ReLU(inception_4d_3x3_reduce_bn), id: inception_4d_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 192, pad: 1}
+  expr: inception_4d_3x3 = Convolution(inception_4d_3x3_reduce_bn, @inception_4d_3x3_0,@inception_4d_3x3_1)
+  id: inception_4d_3x3
+- attrs: {frozen: true}
+  expr: inception_4d_3x3_bn = BN(inception_4d_3x3, @inception_4d_3x3_bn_0,@inception_4d_3x3_bn_1,@inception_4d_3x3_bn_2)
+  id: inception_4d_3x3_bn
+- {expr: inception_4d_3x3_bn = ReLU(inception_4d_3x3_bn), id: inception_4d_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 160}
+  expr: inception_4d_double_3x3_reduce = Convolution(inception_4c_output, @inception_4d_double_3x3_reduce_0,@inception_4d_double_3x3_reduce_1)
+  id: inception_4d_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4d_double_3x3_reduce_bn = BN(inception_4d_double_3x3_reduce, @inception_4d_double_3x3_reduce_bn_0,@inception_4d_double_3x3_reduce_bn_1,@inception_4d_double_3x3_reduce_bn_2)
+  id: inception_4d_double_3x3_reduce_bn
+- {expr: inception_4d_double_3x3_reduce_bn = ReLU(inception_4d_double_3x3_reduce_bn),
+  id: inception_4d_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 192, pad: 1}
+  expr: inception_4d_double_3x3_1 = Convolution(inception_4d_double_3x3_reduce_bn,
+    @inception_4d_double_3x3_1_0,@inception_4d_double_3x3_1_1)
+  id: inception_4d_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_4d_double_3x3_1_bn = BN(inception_4d_double_3x3_1, @inception_4d_double_3x3_1_bn_0,@inception_4d_double_3x3_1_bn_1,@inception_4d_double_3x3_1_bn_2)
+  id: inception_4d_double_3x3_1_bn
+- {expr: inception_4d_double_3x3_1_bn = ReLU(inception_4d_double_3x3_1_bn), id: inception_4d_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 192, pad: 1}
+  expr: inception_4d_double_3x3_2 = Convolution(inception_4d_double_3x3_1_bn, @inception_4d_double_3x3_2_0,@inception_4d_double_3x3_2_1)
+  id: inception_4d_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_4d_double_3x3_2_bn = BN(inception_4d_double_3x3_2, @inception_4d_double_3x3_2_bn_0,@inception_4d_double_3x3_2_bn_1,@inception_4d_double_3x3_2_bn_2)
+  id: inception_4d_double_3x3_2_bn
+- {expr: inception_4d_double_3x3_2_bn = ReLU(inception_4d_double_3x3_2_bn), id: inception_4d_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_4d_pool = Pooling(inception_4c_output)
+  id: inception_4d_pool
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4d_pool_proj = Convolution(inception_4d_pool, @inception_4d_pool_proj_0,@inception_4d_pool_proj_1)
+  id: inception_4d_pool_proj
+- attrs: {frozen: true}
+  expr: inception_4d_pool_proj_bn = BN(inception_4d_pool_proj, @inception_4d_pool_proj_bn_0,@inception_4d_pool_proj_bn_1,@inception_4d_pool_proj_bn_2)
+  id: inception_4d_pool_proj_bn
+- {expr: inception_4d_pool_proj_bn = ReLU(inception_4d_pool_proj_bn), id: inception_4d_relu_pool_proj}
+- {expr: 'inception_4d_output = Concat(inception_4d_1x1_bn,inception_4d_3x3_bn,inception_4d_double_3x3_2_bn,inception_4d_pool_proj_bn)',
+  id: inception_4d_output}
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_4e_3x3_reduce = Convolution(inception_4d_output, @inception_4e_3x3_reduce_0,@inception_4e_3x3_reduce_1)
+  id: inception_4e_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4e_3x3_reduce_bn = BN(inception_4e_3x3_reduce, @inception_4e_3x3_reduce_bn_0,@inception_4e_3x3_reduce_bn_1,@inception_4e_3x3_reduce_bn_2)
+  id: inception_4e_3x3_reduce_bn
+- {expr: inception_4e_3x3_reduce_bn = ReLU(inception_4e_3x3_reduce_bn), id: inception_4e_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 192, pad: 1, stride: 2}
+  expr: inception_4e_3x3 = Convolution(inception_4e_3x3_reduce_bn, @inception_4e_3x3_0,@inception_4e_3x3_1)
+  id: inception_4e_3x3
+- attrs: {frozen: true}
+  expr: inception_4e_3x3_bn = BN(inception_4e_3x3, @inception_4e_3x3_bn_0,@inception_4e_3x3_bn_1,@inception_4e_3x3_bn_2)
+  id: inception_4e_3x3_bn
+- {expr: inception_4e_3x3_bn = ReLU(inception_4e_3x3_bn), id: inception_4e_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 192}
+  expr: inception_4e_double_3x3_reduce = Convolution(inception_4d_output, @inception_4e_double_3x3_reduce_0,@inception_4e_double_3x3_reduce_1)
+  id: inception_4e_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_4e_double_3x3_reduce_bn = BN(inception_4e_double_3x3_reduce, @inception_4e_double_3x3_reduce_bn_0,@inception_4e_double_3x3_reduce_bn_1,@inception_4e_double_3x3_reduce_bn_2)
+  id: inception_4e_double_3x3_reduce_bn
+- {expr: inception_4e_double_3x3_reduce_bn = ReLU(inception_4e_double_3x3_reduce_bn),
+  id: inception_4e_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 256, pad: 1}
+  expr: inception_4e_double_3x3_1 = Convolution(inception_4e_double_3x3_reduce_bn,
+    @inception_4e_double_3x3_1_0,@inception_4e_double_3x3_1_1)
+  id: inception_4e_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_4e_double_3x3_1_bn = BN(inception_4e_double_3x3_1, @inception_4e_double_3x3_1_bn_0,@inception_4e_double_3x3_1_bn_1,@inception_4e_double_3x3_1_bn_2)
+  id: inception_4e_double_3x3_1_bn
+- {expr: inception_4e_double_3x3_1_bn = ReLU(inception_4e_double_3x3_1_bn), id: inception_4e_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 256, pad: 1, stride: 2}
+  expr: inception_4e_double_3x3_2 = Convolution(inception_4e_double_3x3_1_bn, @inception_4e_double_3x3_2_0,@inception_4e_double_3x3_2_1)
+  id: inception_4e_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_4e_double_3x3_2_bn = BN(inception_4e_double_3x3_2, @inception_4e_double_3x3_2_bn_0,@inception_4e_double_3x3_2_bn_1,@inception_4e_double_3x3_2_bn_2)
+  id: inception_4e_double_3x3_2_bn
+- {expr: inception_4e_double_3x3_2_bn = ReLU(inception_4e_double_3x3_2_bn), id: inception_4e_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: max, stride: 2}
+  expr: inception_4e_pool = Pooling(inception_4d_output)
+  id: inception_4e_pool
+- {expr: 'inception_4e_output = Concat(inception_4e_3x3_bn,inception_4e_double_3x3_2_bn,inception_4e_pool)',
+  id: inception_4e_output}
+- attrs: {kernel_size: 1, num_output: 352}
+  expr: inception_5a_1x1 = Convolution(inception_4e_output, @inception_5a_1x1_0,@inception_5a_1x1_1)
+  id: inception_5a_1x1
+- attrs: {frozen: true}
+  expr: inception_5a_1x1_bn = BN(inception_5a_1x1, @inception_5a_1x1_bn_0,@inception_5a_1x1_bn_1,@inception_5a_1x1_bn_2)
+  id: inception_5a_1x1_bn
+- {expr: inception_5a_1x1_bn = ReLU(inception_5a_1x1_bn), id: inception_5a_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 192}
+  expr: inception_5a_3x3_reduce = Convolution(inception_4e_output, @inception_5a_3x3_reduce_0,@inception_5a_3x3_reduce_1)
+  id: inception_5a_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_5a_3x3_reduce_bn = BN(inception_5a_3x3_reduce, @inception_5a_3x3_reduce_bn_0,@inception_5a_3x3_reduce_bn_1,@inception_5a_3x3_reduce_bn_2)
+  id: inception_5a_3x3_reduce_bn
+- {expr: inception_5a_3x3_reduce_bn = ReLU(inception_5a_3x3_reduce_bn), id: inception_5a_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 320, pad: 1}
+  expr: inception_5a_3x3 = Convolution(inception_5a_3x3_reduce_bn, @inception_5a_3x3_0,@inception_5a_3x3_1)
+  id: inception_5a_3x3
+- attrs: {frozen: true}
+  expr: inception_5a_3x3_bn = BN(inception_5a_3x3, @inception_5a_3x3_bn_0,@inception_5a_3x3_bn_1,@inception_5a_3x3_bn_2)
+  id: inception_5a_3x3_bn
+- {expr: inception_5a_3x3_bn = ReLU(inception_5a_3x3_bn), id: inception_5a_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 160}
+  expr: inception_5a_double_3x3_reduce = Convolution(inception_4e_output, @inception_5a_double_3x3_reduce_0,@inception_5a_double_3x3_reduce_1)
+  id: inception_5a_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_5a_double_3x3_reduce_bn = BN(inception_5a_double_3x3_reduce, @inception_5a_double_3x3_reduce_bn_0,@inception_5a_double_3x3_reduce_bn_1,@inception_5a_double_3x3_reduce_bn_2)
+  id: inception_5a_double_3x3_reduce_bn
+- {expr: inception_5a_double_3x3_reduce_bn = ReLU(inception_5a_double_3x3_reduce_bn),
+  id: inception_5a_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 224, pad: 1}
+  expr: inception_5a_double_3x3_1 = Convolution(inception_5a_double_3x3_reduce_bn,
+    @inception_5a_double_3x3_1_0,@inception_5a_double_3x3_1_1)
+  id: inception_5a_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_5a_double_3x3_1_bn = BN(inception_5a_double_3x3_1, @inception_5a_double_3x3_1_bn_0,@inception_5a_double_3x3_1_bn_1,@inception_5a_double_3x3_1_bn_2)
+  id: inception_5a_double_3x3_1_bn
+- {expr: inception_5a_double_3x3_1_bn = ReLU(inception_5a_double_3x3_1_bn), id: inception_5a_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 224, pad: 1}
+  expr: inception_5a_double_3x3_2 = Convolution(inception_5a_double_3x3_1_bn, @inception_5a_double_3x3_2_0,@inception_5a_double_3x3_2_1)
+  id: inception_5a_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_5a_double_3x3_2_bn = BN(inception_5a_double_3x3_2, @inception_5a_double_3x3_2_bn_0,@inception_5a_double_3x3_2_bn_1,@inception_5a_double_3x3_2_bn_2)
+  id: inception_5a_double_3x3_2_bn
+- {expr: inception_5a_double_3x3_2_bn = ReLU(inception_5a_double_3x3_2_bn), id: inception_5a_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: ave, pad: 1, stride: 1}
+  expr: inception_5a_pool = Pooling(inception_4e_output)
+  id: inception_5a_pool
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_5a_pool_proj = Convolution(inception_5a_pool, @inception_5a_pool_proj_0,@inception_5a_pool_proj_1)
+  id: inception_5a_pool_proj
+- attrs: {frozen: true}
+  expr: inception_5a_pool_proj_bn = BN(inception_5a_pool_proj, @inception_5a_pool_proj_bn_0,@inception_5a_pool_proj_bn_1,@inception_5a_pool_proj_bn_2)
+  id: inception_5a_pool_proj_bn
+- {expr: inception_5a_pool_proj_bn = ReLU(inception_5a_pool_proj_bn), id: inception_5a_relu_pool_proj}
+- {expr: 'inception_5a_output = Concat(inception_5a_1x1_bn,inception_5a_3x3_bn,inception_5a_double_3x3_2_bn,inception_5a_pool_proj_bn)',
+  id: inception_5a_output}
+- attrs: {kernel_size: 1, num_output: 352}
+  expr: inception_5b_1x1 = Convolution(inception_5a_output, @inception_5b_1x1_0,@inception_5b_1x1_1)
+  id: inception_5b_1x1
+- attrs: {frozen: true}
+  expr: inception_5b_1x1_bn = BN(inception_5b_1x1, @inception_5b_1x1_bn_0,@inception_5b_1x1_bn_1,@inception_5b_1x1_bn_2)
+  id: inception_5b_1x1_bn
+- {expr: inception_5b_1x1_bn = ReLU(inception_5b_1x1_bn), id: inception_5b_relu_1x1}
+- attrs: {kernel_size: 1, num_output: 192}
+  expr: inception_5b_3x3_reduce = Convolution(inception_5a_output, @inception_5b_3x3_reduce_0,@inception_5b_3x3_reduce_1)
+  id: inception_5b_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_5b_3x3_reduce_bn = BN(inception_5b_3x3_reduce, @inception_5b_3x3_reduce_bn_0,@inception_5b_3x3_reduce_bn_1,@inception_5b_3x3_reduce_bn_2)
+  id: inception_5b_3x3_reduce_bn
+- {expr: inception_5b_3x3_reduce_bn = ReLU(inception_5b_3x3_reduce_bn), id: inception_5b_relu_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 320, pad: 1}
+  expr: inception_5b_3x3 = Convolution(inception_5b_3x3_reduce_bn, @inception_5b_3x3_0,@inception_5b_3x3_1)
+  id: inception_5b_3x3
+- attrs: {frozen: true}
+  expr: inception_5b_3x3_bn = BN(inception_5b_3x3, @inception_5b_3x3_bn_0,@inception_5b_3x3_bn_1,@inception_5b_3x3_bn_2)
+  id: inception_5b_3x3_bn
+- {expr: inception_5b_3x3_bn = ReLU(inception_5b_3x3_bn), id: inception_5b_relu_3x3}
+- attrs: {kernel_size: 1, num_output: 192}
+  expr: inception_5b_double_3x3_reduce = Convolution(inception_5a_output, @inception_5b_double_3x3_reduce_0,@inception_5b_double_3x3_reduce_1)
+  id: inception_5b_double_3x3_reduce
+- attrs: {frozen: true}
+  expr: inception_5b_double_3x3_reduce_bn = BN(inception_5b_double_3x3_reduce, @inception_5b_double_3x3_reduce_bn_0,@inception_5b_double_3x3_reduce_bn_1,@inception_5b_double_3x3_reduce_bn_2)
+  id: inception_5b_double_3x3_reduce_bn
+- {expr: inception_5b_double_3x3_reduce_bn = ReLU(inception_5b_double_3x3_reduce_bn),
+  id: inception_5b_relu_double_3x3_reduce}
+- attrs: {kernel_size: 3, num_output: 224, pad: 1}
+  expr: inception_5b_double_3x3_1 = Convolution(inception_5b_double_3x3_reduce_bn,
+    @inception_5b_double_3x3_1_0,@inception_5b_double_3x3_1_1)
+  id: inception_5b_double_3x3_1
+- attrs: {frozen: true}
+  expr: inception_5b_double_3x3_1_bn = BN(inception_5b_double_3x3_1, @inception_5b_double_3x3_1_bn_0,@inception_5b_double_3x3_1_bn_1,@inception_5b_double_3x3_1_bn_2)
+  id: inception_5b_double_3x3_1_bn
+- {expr: inception_5b_double_3x3_1_bn = ReLU(inception_5b_double_3x3_1_bn), id: inception_5b_relu_double_3x3_1}
+- attrs: {kernel_size: 3, num_output: 224, pad: 1}
+  expr: inception_5b_double_3x3_2 = Convolution(inception_5b_double_3x3_1_bn, @inception_5b_double_3x3_2_0,@inception_5b_double_3x3_2_1)
+  id: inception_5b_double_3x3_2
+- attrs: {frozen: true}
+  expr: inception_5b_double_3x3_2_bn = BN(inception_5b_double_3x3_2, @inception_5b_double_3x3_2_bn_0,@inception_5b_double_3x3_2_bn_1,@inception_5b_double_3x3_2_bn_2)
+  id: inception_5b_double_3x3_2_bn
+- {expr: inception_5b_double_3x3_2_bn = ReLU(inception_5b_double_3x3_2_bn), id: inception_5b_relu_double_3x3_2}
+- attrs: {kernel_size: 3, mode: max, pad: 1, stride: 1}
+  expr: inception_5b_pool = Pooling(inception_5a_output)
+  id: inception_5b_pool
+- attrs: {kernel_size: 1, num_output: 128}
+  expr: inception_5b_pool_proj = Convolution(inception_5b_pool, @inception_5b_pool_proj_0,@inception_5b_pool_proj_1)
+  id: inception_5b_pool_proj
+- attrs: {frozen: true}
+  expr: inception_5b_pool_proj_bn = BN(inception_5b_pool_proj, @inception_5b_pool_proj_bn_0,@inception_5b_pool_proj_bn_1,@inception_5b_pool_proj_bn_2)
+  id: inception_5b_pool_proj_bn
+- {expr: inception_5b_pool_proj_bn = ReLU(inception_5b_pool_proj_bn), id: inception_5b_relu_pool_proj}
+- {expr: 'inception_5b_output = Concat(inception_5b_1x1_bn,inception_5b_3x3_bn,inception_5b_double_3x3_2_bn,inception_5b_pool_proj_bn)',
+  id: inception_5b_output}
+- attrs: {kernel_size: 7, mode: ave, stride: 1}
+  expr: global_pool = Pooling(inception_5b_output)
+  id: global_pool
+- attrs: {dropout_ratio: 0.8}
+  expr: global_pool = Dropout(global_pool)
+  id: dropout
+- attrs: {num_output: 101}
+  expr: fc_action = InnerProduct(global_pool, @fc_action_0,@fc_action_1)
+  id: fc_action
+- attrs: {kernel_h: 3, kernel_w: 1, mode: ave}
+  expr: fc_pool = Pooling(fc_action|div_dim(1, 3, 1, _))
+  id: fc_pool
+- id: loss
+  expr: "loss = SoftmaxWithLoss(fc_pool, label)"
+- id: accuracy
+  expr: "accuracy = Accuracy(fc_pool | merge_dim(0,1,2), label)"
+
+
+name: BN-Inception_Flow
+params:
+- id: conv1_7x7_s2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: conv1_7x7_s2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: conv1_7x7_s2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: conv1_7x7_s2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: conv2_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: conv2_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: conv2_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: conv2_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: conv2_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: conv2_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: conv2_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: conv2_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3a_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3a_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3a_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3a_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3a_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3a_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3a_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3a_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3a_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3b_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3b_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3b_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3b_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3b_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3b_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3b_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3b_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3b_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3c_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3c_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3c_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3c_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3c_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3c_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3c_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3c_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3c_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3c_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3c_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3c_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3c_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3c_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3c_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_3c_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3c_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_3c_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_3c_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_3c_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4a_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4a_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4a_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4a_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4a_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4a_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4a_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4a_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4a_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4b_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4b_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4b_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4b_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4b_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4b_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4b_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4b_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4b_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4c_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4c_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4c_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4c_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4c_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4c_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4c_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4c_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4c_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4d_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4d_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4d_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4d_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4d_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4d_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4d_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4d_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4d_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4e_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4e_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4e_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4e_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4e_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4e_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4e_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4e_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4e_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4e_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4e_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4e_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4e_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4e_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4e_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_4e_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4e_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_4e_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_4e_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_4e_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5a_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5a_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5a_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5a_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5a_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5a_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5a_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5a_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5a_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_1x1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_1x1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_1x1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_1x1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5b_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5b_3x3_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_3x3_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_3x3_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_3x3_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5b_double_3x3_reduce_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_double_3x3_reduce_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_double_3x3_reduce_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5b_double_3x3_reduce_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_double_3x3_1_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_double_3x3_1_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_double_3x3_1_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5b_double_3x3_1_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_double_3x3_2_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_double_3x3_2_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_double_3x3_2_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_double_3x3_2_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: inception_5b_pool_proj_0
+  learning-policy: {decay_mult: 1.0, init: xavier(), lr_mult: 1.0}
+- id: inception_5b_pool_proj_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.2), lr_mult: 2.0}
+- id: inception_5b_pool_proj_bn_0
+  learning-policy: {decay_mult: 0.0, init: fill(1.0), lr_mult: 1.0}
+- id: inception_5b_pool_proj_bn_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 1.0}
+- id: fc_action_1
+  learning-policy: {decay_mult: 0.0, init: fill(0.0), lr_mult: 2.0}
+- id: fc_action_0
+  learning-policy: {decay_mult: 1.0, init: gauss(0.001), lr_mult: 1.0}

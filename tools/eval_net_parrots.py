@@ -6,6 +6,7 @@ import cv2
 import numpy as np
 import multiprocessing
 from sklearn.metrics import confusion_matrix
+import time
 
 sys.path.append('.')
 from pyActionRecog import parse_directory
@@ -19,14 +20,17 @@ parser.add_argument('split', type=int, choices=[1, 2, 3],
                     help='on which split to test the network')
 parser.add_argument('modality', type=str, choices=['rgb', 'flow'])
 parser.add_argument('frame_path', type=str, help="root directory holding the frames")
-parser.add_argument('parrots_session', type=str)
+parser.add_argument('parrots_model', type=str)
+parser.add_argument('parrots_weights', type=str)
 parser.add_argument('--rgb_prefix', type=str, help="prefix of RGB frames", default='img_')
 parser.add_argument('--flow_x_prefix', type=str, help="prefix of x direction flow images", default='flow_x_')
 parser.add_argument('--flow_y_prefix', type=str, help="prefix of y direction flow images", default='flow_y_')
 parser.add_argument('--num_frame_per_video', type=int, default=25,
                     help="prefix of y direction flow images")
 parser.add_argument('--save_scores', type=str, default=None, help='the filename to save the scores in')
+parser.add_argument('--score_name', type=str, default='fc-action')
 parser.add_argument('--num_worker', type=int, default=1)
+parser.add_argument('--max_num_gpu', type=int, default=8)
 parser.add_argument("--parrots_path", type=str, default='/home/yjxiong/Parrots/pyparrots',
                     help='path to the Parrots toolbox')
 args = parser.parse_args()
@@ -37,9 +41,20 @@ sys.path.append(args.parrots_path)
 from pyActionRecog.action_parrots import ParrotsNet
 
 
-def build_net():
+def build_net(device_ids=None):
     global net
-    net = ParrotsNet(args.parrots_session)
+
+    my_id = multiprocessing.current_process()._identity[0] \
+        if args.num_worker > 1 else 1
+
+    if device_ids:
+        gpu_id = device_ids[my_id - 1]
+    else:
+        gpu_id = (my_id - 1) % args.max_num_gpu
+
+    net = ParrotsNet(args.parrots_model, args.parrots_weights, gpu_id,
+                     10, score_name=args.score_name)
+
 build_net()
 
 # build neccessary information
@@ -102,13 +117,40 @@ def eval_video(video):
         # run predication in batches
         scores = net.predict_flow_stack_list(flow_stack_list, score_name, frame_size=(340, 256))
 
-    print 'video {} done'.format(vid)
+    # print 'video {} done'.format(vid)
     sys.stdin.flush()
-    return scores, label
+    return scores, label, vid
 
 
+def callback(rst):
+    global proc_start_time
+    eval_rst.append(rst)
+    cnt = len(eval_rst)
+    if cnt % args.display == 0:
+        cnt_time = time.time()
+        print 'video {} done, total {}/{}, average {} sec/video'.format(rst[-1], cnt,
+                                                                        len(eval_video_list),
+                                                                        float(cnt_time) / cnt)
 
-video_scores = map(eval_video, eval_video_list)
+
+if args.num_worker > 1:
+    global proc_start_time
+    pool = multiprocessing.Pool(args.num_worker, initializer=build_net)
+    eval_rst = []
+    proc_start_time = time.time()
+    jobs = [pool.apply_async(eval_video, args=(x,), callback=callback) for x in eval_video_list]
+    pool.close()
+    pool.join()
+
+    rst_dict = {x[-1]:x[:2] for x in eval_rst}
+    video_scores = [rst_dict[v[-1]] for v in eval_video_list]
+else:
+    build_net(0)
+    eval_rst = []
+    for i, v in enumerate(eval_video_list):
+        eval_rst.append(eval_video(v))
+        print 'video {} done, total {}/{}'.format(v[-1], i, len(eval_video_list))
+    video_scores = [x[:2] for x in eval_rst]
 
 video_pred = [np.argmax(default_aggregation_func(x[0])) for x in video_scores]
 video_labels = [x[1] for x in video_scores]

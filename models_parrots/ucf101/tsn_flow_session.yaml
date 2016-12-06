@@ -1,0 +1,81 @@
+model:
+    yaml: "models_parrots/ucf101/tsn_bn_inception_flow_model.yaml"
+load_from: "models_parrots/bn_inception_flow_init.parrots"
+snapshot_interval: 18000
+work_dir: models/
+init_missing: true
+scheme:
+    max_iter: 18000
+    epoch:
+      - flow: train
+        iter_num: 1000
+        log_interval: 20
+        log_outputs: [loss, accuracy]
+      - flow: val
+        iter_num: 19
+        log_outputs: [loss, accuracy]
+flows:
+    - train:
+        spec:
+            inputs: [data, label]
+            outputs: [loss, accuracy]
+            losses: [loss]
+        batch_size: 128
+        devices: gpu(0:8)
+        learn:
+            lr: 0.001
+            weight_decay: 0.0005
+            lr_policy: step(0.1, 8000)
+            updater:
+                type: sgd
+                momentum: 0.9
+
+        feeder:
+            type: pipeline
+            num_thread: 32
+            pipeline:
+                - {expr: "data, label = video_data()",
+                    attr: {listfile: "data/ucf101_flow_train_split_1.txt",
+                           shuffle: true,
+                           num_segments: 3,
+                           snippet_len: 5,
+                           modality: flow,
+                           name_pattern: "flow_%c_%05d.jpg" } }
+                - {expr: data = decode(data), attr: {grayscale: true}}
+                - {expr: data = grouping(data), attr: {group_size: 10, merge_dim: true}}
+                - {expr: data = crop(data),
+                    attr: {mode: multi_scale_size,
+                           size_ratios: [1, .875, .75],
+                           fix_corner: true, max_distort: 1} }
+                - {expr: data = flip(data), attr: {flow_field: true}}
+                - {expr: data = resize(data), attr: {size: 224 } }
+                - {expr: data = scaleOffset(data), attr: {offset: [128]} }
+                - {expr: data = grouping(data), attr: {global_group: true, merge_dim: false}}
+    - val:
+        spec:
+            inputs: [data, label]
+            outputs: [loss, accuracy]
+            losses: [loss]
+        batch_size: 200
+        devices: gpu(0:8)
+        feeder:
+            num_thread: 32
+            pipeline:
+                - {expr: "data, label = video_data()",
+                    attr: {listfile: "data/ucf101_flow_val_split_1.txt",
+                           num_segments: 3,
+                           snippet_len: 5,
+                           modality: flow,
+                           name_pattern: "flow_%c_%05d.jpg" } }
+                - {expr: data = decode(data), attr: {grayscale: true}}
+                - {expr: data = grouping(data), attr: {group_size: 10, merge_dim: true}}
+                #- {expr: data = resize(data), attr: {size: 256 } }
+                - {expr: data = crop(data), attr: {crop_size: 224 } }
+                - {expr: data = scaleOffset(data), attr: {offset: [128]} }
+                - {expr: data = grouping(data), attr: {global_group: true, merge_dim: false}}
+extra:
+  best_snapshot:
+    val_flow: val
+    field: accuracy
+    factor: -1
+    save_instantly: true
