@@ -2,8 +2,9 @@ model:
     yaml: "models_parrots/ucf101/tsn_bn_inception_rgb_model.yaml"
 load_from: "models_parrots/bn_inception_rgb_init.parrots"
 snapshot_interval: 3500
-work_dir: models/
+work_dir: models/tsn_rgb_split1
 init_missing: true
+use_dynamic_memory: true
 scheme:
     max_iter: 3500
     epoch:
@@ -21,7 +22,7 @@ flows:
             outputs: [loss, accuracy]
             losses: [loss]
         batch_size: 128
-        devices: gpu(0:8)
+        devices: gpu(4:8)
         learn:
             lr: 0.001
             weight_decay: 0.0005
@@ -55,7 +56,7 @@ flows:
             outputs: [loss, accuracy]
             losses: [loss]
         batch_size: 200
-        devices: gpu(0:8)
+        devices: gpu(4:8)
         feeder:
             num_thread: 16
             pipeline:

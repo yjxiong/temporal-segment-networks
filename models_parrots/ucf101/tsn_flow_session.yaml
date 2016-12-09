@@ -2,7 +2,7 @@ model:
     yaml: "models_parrots/ucf101/tsn_bn_inception_flow_model.yaml"
 load_from: "models_parrots/bn_inception_flow_init.parrots"
 snapshot_interval: 18000
-work_dir: models/
+work_dir: models/tsn_flow_split1
 init_missing: true
 scheme:
     max_iter: 18000
@@ -23,7 +23,7 @@ flows:
         batch_size: 128
         devices: gpu(0:8)
         learn:
-            lr: 0.001
+            lr: 0.005
             weight_decay: 0.0005
             lr_policy: step(0.1, 8000)
             updater:

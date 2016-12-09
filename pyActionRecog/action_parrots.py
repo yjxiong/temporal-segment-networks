@@ -59,7 +59,7 @@ class ParrotsNet(object):
 
         self._parrots_flow = self._parrots_session.flow("main")
 
-        self._subtract_buffer = np.ones(self._sample_shape, dtype=np.float32) * -128.0
+        self._subtract_buffer = np.ones(self._sample_shape, dtype=np.float32) * 128.0
 
     def predict_single_rgb_frame(self, frame, over_sample=True,
                              multiscale=None, frame_size=None):
@@ -106,10 +106,13 @@ class ParrotsNet(object):
             os_frame = fast_list2arr([flow_stack])
 
         os_frame = os_frame - self._subtract_buffer
+        
+ 	#print os_frame[0]
 
         self._parrots_flow.set_input('data', os_frame.T)
 
         self._parrots_flow.forward()
         score = self._parrots_flow.data(self._score_name).value().T.copy()
+        #print score[0,:]
 
         return score

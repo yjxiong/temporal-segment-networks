@@ -32,6 +32,7 @@ parser.add_argument('--score_name', type=str, default='fc_action')
 parser.add_argument('--num_worker', type=int, default=1)
 parser.add_argument('--max_num_gpu', type=int, default=8)
 parser.add_argument('--display', type=int, default=1)
+parser.add_argument('--gpu_list', type=int, nargs='+', default=None)
 parser.add_argument("--parrots_path", type=str, default='/home/yjxiong/Parrots/parrots/python',
                     help='path to the Parrots toolbox')
 args = parser.parse_args()
@@ -128,7 +129,7 @@ def callback(rst):
 
 if args.num_worker > 1:
     global proc_start_time
-    pool = multiprocessing.Pool(args.num_worker, initializer=build_net)
+    pool = multiprocessing.Pool(args.num_worker, initializer=build_net, initargs=(args.gpu_list,))
     eval_rst = []
     proc_start_time = time.time()
     jobs = [pool.apply_async(eval_video, args=(x,), callback=callback) for x in eval_video_list]

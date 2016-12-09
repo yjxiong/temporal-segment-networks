@@ -1,6 +1,5 @@
 inputs:
 - {id: data, spec: "float32(224, 224, 10, _)"}
-- {id: label, spec: "uint32(1, _)"}
 
 layers:
 - attrs: {kernel_size: 7, num_output: 64, pad: 3, stride: 2}
