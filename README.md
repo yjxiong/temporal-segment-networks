@@ -5,7 +5,7 @@ This repository holds the codes and models for the paper
 > 
 **Temporal Segment Networks: Towards Good Practices for Deep Action Recognition**,
 Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool,
-*ECCV 2016*, Amsterdam, Netherland.
+*ECCV 2016*, Amsterdam, Netherlands.
 >
 [[Arxiv Preprint](http://arxiv.org/abs/1608.00859)]
 
