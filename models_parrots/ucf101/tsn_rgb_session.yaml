@@ -1,12 +1,12 @@
 model: 
     yaml: "models_parrots/ucf101/tsn_bn_inception_rgb_model.yaml"
 load_from: "models_parrots/bn_inception_rgb_init.parrots"
-snapshot_interval: 3500
+snapshot_interval: 4500
 work_dir: models/tsn_rgb_split1
 init_missing: true
 use_dynamic_memory: true
 scheme:
-    max_iter: 3500
+    max_iter: 4500
     epoch:
       - flow: train
         iter_num: 500
@@ -22,11 +22,11 @@ flows:
             outputs: [loss, accuracy]
             losses: [loss]
         batch_size: 128
-        devices: gpu(4:8)
+        devices: gpu(0:4)
         learn:
             lr: 0.001
             weight_decay: 0.0005
-            lr_policy: step(0.1, 1500)
+            lr_policy: step(0.1, 2000)
             updater:
                 type: sgd
                 momentum: 0.9
@@ -40,6 +40,7 @@ flows:
                            shuffle: true,
                            num_segments: 3,
                            snippet_len: 1,
+                           random_shift: true,
                            name_pattern: "img_%05d.jpg" } }
                 - {expr: data = decode(data) }
                 - {expr: data = crop(data),
@@ -56,7 +57,7 @@ flows:
             outputs: [loss, accuracy]
             losses: [loss]
         batch_size: 200
-        devices: gpu(4:8)
+        devices: gpu(0:4)
         feeder:
             num_thread: 16
             pipeline:

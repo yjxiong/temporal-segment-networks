@@ -5,7 +5,7 @@ snapshot_interval: 18000
 work_dir: models/tsn_flow_split1
 init_missing: true
 scheme:
-    max_iter: 18000
+    max_iter: 21000
     epoch:
       - flow: train
         iter_num: 1000
@@ -25,7 +25,7 @@ flows:
         learn:
             lr: 0.005
             weight_decay: 0.0005
-            lr_policy: step(0.1, 8000)
+            lr_policy: multistep(0.1, 12000, 16000)
             updater:
                 type: sgd
                 momentum: 0.9
@@ -40,6 +40,7 @@ flows:
                            num_segments: 3,
                            snippet_len: 5,
                            modality: flow,
+                           random_shift: true,
                            name_pattern: "flow_%c_%05d.jpg" } }
                 - {expr: data = decode(data), attr: {grayscale: true}}
                 - {expr: data = grouping(data), attr: {group_size: 10, merge_dim: true}}
