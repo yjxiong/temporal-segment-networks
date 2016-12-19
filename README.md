@@ -132,7 +132,7 @@ It will take from several hours to several days to extract optical flows for the
 To help reproduce the results reported in the paper, we provide reference models trained by us for instant testing. Please use the following command to get the reference models.
 
 ```
-bash scripts/get_reference_model.sh
+bash scripts/get_reference_models.sh
 ```
 
 ### Video-level testing
