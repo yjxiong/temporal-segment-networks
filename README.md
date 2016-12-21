@@ -119,7 +119,7 @@ These can be achieved with the script `scripts/extract_optical_flow.sh`. The scr
 The command for running optical flow extraction is as follows
 
 ```
-bash scripts/extraction_optical_flow.sh SRC_FOLDER OUT_FOLDER NUM_WORKER
+bash scripts/extract_optical_flow.sh SRC_FOLDER OUT_FOLDER NUM_WORKER
 ```
 
 It will take from several hours to several days to extract optical flows for the whole datasets, depending on the number of GPUs.  
