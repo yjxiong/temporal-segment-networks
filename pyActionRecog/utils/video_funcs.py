@@ -18,6 +18,14 @@ def default_aggregation_func(score_arr, normalization=True, crop_agg=None):
         return crop_agg(score_arr, axis=1).mean(axis=0)
 
 
+def top_k_aggregation_func(score_arr, k, normalization=True, crop_agg=None):
+    crop_agg = np.mean if crop_agg is None else crop_agg
+    if normalization:
+        return softmax(np.sort(crop_agg(score_arr, axis=1), axis=0)[-k:, :].mean(axis=0))
+    else:
+        return np.sort(crop_agg(score_arr, axis=1), axis=0)[-k:, :].mean(axis=0)
+
+
 def sliding_window_aggregation_func(score, spans=[1, 2, 4, 8, 16], overlap=0.2, norm=True, fps=1):
     """
     This is the aggregation function used for ActivityNet Challenge 2016
