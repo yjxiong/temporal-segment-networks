@@ -5,7 +5,7 @@ This repository holds the codes and models for the paper
 > 
 **Temporal Segment Networks: Towards Good Practices for Deep Action Recognition**,
 Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool,
-*ECCV 2016*, Amsterdam, Netherland.
+*ECCV 2016*, Amsterdam, Netherlands.
 >
 [[Arxiv Preprint](http://arxiv.org/abs/1608.00859)]
 
@@ -119,7 +119,7 @@ These can be achieved with the script `scripts/extract_optical_flow.sh`. The scr
 The command for running optical flow extraction is as follows
 
 ```
-bash scripts/extraction_optical_flow.sh SRC_FOLDER OUT_FOLDER NUM_WORKER
+bash scripts/extract_optical_flow.sh SRC_FOLDER OUT_FOLDER NUM_WORKER
 ```
 
 It will take from several hours to several days to extract optical flows for the whole datasets, depending on the number of GPUs.  
@@ -132,7 +132,7 @@ It will take from several hours to several days to extract optical flows for the
 To help reproduce the results reported in the paper, we provide reference models trained by us for instant testing. Please use the following command to get the reference models.
 
 ```
-bash scripts/get_reference_model.sh
+bash scripts/get_reference_models.sh
 ```
 
 ### Video-level testing
