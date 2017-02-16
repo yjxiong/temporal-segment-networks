@@ -37,9 +37,13 @@ cd opencv-$version
 [[ -d build ]] || mkdir build
 cd build
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D WITH_TBB=ON  -D WITH_V4L=ON ..
-make -j32
-cp lib/cv2.so ../../../
-echo "OpenCV" $version "built"
+if make -j32 ; then
+    cp lib/cv2.so ../../../
+    echo "OpenCV" $version "built."
+else
+    echo "Failed to build OpenCV. Please check the logs above."
+    exit 1
+fi
 
 # build dense_flow
 cd ../../../
@@ -49,8 +53,12 @@ cd lib/dense_flow
 [[ -d build ]] || mkdir build
 cd build
 OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake ..
-make -j
-echo "Dense Flow built"
+if make -j ; then
+    echo "Dense Flow built."
+else
+    echo "Failed to build Dense Flow. Please check the logs above."
+    exit 1
+fi
 
 # build caffe
 echo "Building Caffe, MPI status: ${CAFFE_USE_MPI}"
@@ -62,6 +70,11 @@ OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake .. -DUSE_MPI=ON -DMPI
 else
 OpenCV_DIR=../../../3rd-party/opencv-$version/build/ cmake ..
 fi
-make -j32 install
-echo "Caffe Built"
-cd ../../../
+if make -j32 install ; then
+    echo "Caffe Built."
+    echo "All tools built. Happy experimenting!"
+    cd ../../../
+else
+    echo "Failed to build Caffe. Please check the logs above."
+    exit 1
+fi
