@@ -16,7 +16,7 @@ Nov. 5, 2016 - The project page for TSN is online. [website][tsn_site]
 Sep. 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN training are affected. 
 You are advised to update to the latest version.
 
-##[FAQ][faq]
+## [FAQ][faq]
 
 Below is the guidance to reproduce the reported results and explore more.
 
@@ -265,7 +265,7 @@ It's better to always make sure the effective batchsize, which equals to `batch_
 Here, `batch_size` is the number in the model's prototxt, for example [line 9](https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_rgb_train_val.prototxt#L9)
 in `models/ucf101/tsn_bn_inception_rgb_train_val.protoxt`.
  
-#Other Info
+# Other Info
 [[back to top](#temporal-segment-networks-tsn)]
 
 ## Citation
