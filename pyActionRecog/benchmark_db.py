@@ -2,6 +2,7 @@ import glob
 import fnmatch
 import os
 import random
+from anet_db import ANetDB
 
 
 def parse_directory(path, rgb_prefix='img_', flow_x_prefix='flow_x_', flow_y_prefix='flow_y_'):
@@ -110,4 +111,22 @@ def parse_hmdb51_splits():
             (vid, class_dict[cls[0]]) for cls in class_info_list for vid in cls[3] if cls[1] == i
         ]
         splits.append((train_list, test_list))
+    return splits
+
+
+def parse_activitynet_splits(version):
+    db = ANetDB.get_db(version)
+    train_instance = db.get_subset_instance('training')
+    val_instance = db.get_subset_instance('validation')
+    test_instance = db.get_subset_videos('testing')
+
+    splits = []
+
+    train_list = [(x.name, x.num_label) for x in train_instance]
+    val_list = [(x.name, x.num_label) for x in val_instance]
+    test_list = [(x.id, 0) for x in test_instance]
+
+    splits.append((train_list, val_list))
+    splits.append((train_list + val_list, test_list))
+
     return splits

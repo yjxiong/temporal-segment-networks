@@ -7,7 +7,7 @@ from pyActionRecog import parse_directory, build_split_list
 from pyActionRecog import parse_split_file
 
 parser = argparse.ArgumentParser()
-parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51'])
+parser.add_argument('dataset', type=str, choices=['ucf101', 'hmdb51', 'activitynet_1.2', 'activitynet_1.3'])
 parser.add_argument('frame_path', type=str, help="root directory holding the frames")
 parser.add_argument('--rgb_prefix', type=str, help="prefix of RGB frames", default='img_')
 parser.add_argument('--flow_x_prefix', type=str, help="prefix of x direction flow images", default='flow_x')
@@ -34,7 +34,7 @@ split_tp = parse_split_file(dataset)
 f_info = parse_directory(frame_path, rgb_p, flow_x_p, flow_y_p)
 
 print 'writting list files for training/testing'
-for i in xrange(num_split):
+for i in xrange(max(num_split, len(split_tp))):
     lists = build_split_list(split_tp, f_info, i, shuffle)
     open(os.path.join(out_path, '{}_rgb_train_split_{}.txt'.format(dataset, i+1)), 'w').writelines(lists[0][0])
     open(os.path.join(out_path, '{}_rgb_val_split_{}.txt'.format(dataset, i+1)), 'w').writelines(lists[0][1])
