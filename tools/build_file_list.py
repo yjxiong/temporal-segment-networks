@@ -33,7 +33,7 @@ print 'processing dataset {}'.format(dataset)
 split_tp = parse_split_file(dataset)
 f_info = parse_directory(frame_path, rgb_p, flow_x_p, flow_y_p)
 
-print 'writting list files for training/testing'
+print 'writing list files for training/testing'
 for i in xrange(max(num_split, len(split_tp))):
     lists = build_split_list(split_tp, f_info, i, shuffle)
     open(os.path.join(out_path, '{}_rgb_train_split_{}.txt'.format(dataset, i+1)), 'w').writelines(lists[0][0])
