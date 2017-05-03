@@ -17,6 +17,7 @@ Sep. 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN tr
 You are advised to update to the latest version.
 
 ## [FAQ][faq]
+## [How to Add Custom Dataset][custom guide]
 
 Below is the guidance to reproduce the reported results and explore more.
 
@@ -309,3 +310,4 @@ Limin Wang: lmwang.nju@gmail.com
 [bs_line]:https://github.com/yjxiong/temporal-segment-networks/blob/master/models/ucf101/tsn_bn_inception_flow_train_val.prototxt#L8
 [bug]:https://github.com/yjxiong/caffe/commit/c0d200ba0ed004edcfd387163395be7ea309dbc3
 [tsn_site]:http://yjxiong.me/others/tsn/
+[custom guide]:https://github.com/yjxiong/temporal-segment-networks/wiki/Working-on-custom-datasets.
