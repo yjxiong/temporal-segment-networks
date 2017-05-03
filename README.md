@@ -16,8 +16,7 @@ Nov. 5, 2016 - The project page for TSN is online. [website][tsn_site]
 Sep. 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN training are affected. 
 You are advised to update to the latest version.
 
-## [FAQ][faq]
-## [How to Add Custom Dataset][custom guide]
+## [FAQ][faq],    [How to add a custom dataset][custom guide]
 
 Below is the guidance to reproduce the reported results and explore more.
 
