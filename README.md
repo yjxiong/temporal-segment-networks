@@ -11,6 +11,8 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 ## News & Updates
 
+Aug 10, 2017 - An experimental pytorch implementation of TSN is released [github][tsn-pytorch]
+
 Nov. 5, 2016 - The project page for TSN is online. [website][tsn_site]
 
 Sep. 14, 2016 - We fixed a legacy [bug][bug] in Caffe. Some parameters in TSN training are affected. 
@@ -310,3 +312,4 @@ Limin Wang: lmwang.nju@gmail.com
 [bug]:https://github.com/yjxiong/caffe/commit/c0d200ba0ed004edcfd387163395be7ea309dbc3
 [tsn_site]:http://yjxiong.me/others/tsn/
 [custom guide]:https://github.com/yjxiong/temporal-segment-networks/wiki/Working-on-custom-datasets.
+[tsn-pytorch]:http://github.com/yjxiong/tsn-pytorch
