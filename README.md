@@ -11,7 +11,7 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 ## News & Updates
 
-Sep. 8, 2017 - We released TSN models trained the Kinetics] dataset with 76.6% single model top-1 accuracy. Find the model weights and transfer learning experiment results on the [website][kinetics-action].
+Sep. 8, 2017 - We released TSN models trained on the Kinetics dataset with 76.6% single model top-1 accuracy. Find the model weights and transfer learning experiment results on the [website][kinetics-action].
 
 Aug 10, 2017 - An experimental pytorch implementation of TSN is released [github][tsn-pytorch]
 
