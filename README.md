@@ -11,6 +11,8 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 ## News & Updates
 
+Sep. 8, 2017 - We released TSN models trained the Kinetics] dataset with 76.6% single model top-1 accuracy. Find the model weights and transfer learning experiment results on the [website][kinetics-action].
+
 Aug 10, 2017 - An experimental pytorch implementation of TSN is released [github][tsn-pytorch]
 
 Nov. 5, 2016 - The project page for TSN is online. [website][tsn_site]
@@ -313,3 +315,4 @@ Limin Wang: lmwang.nju@gmail.com
 [tsn_site]:http://yjxiong.me/others/tsn/
 [custom guide]:https://github.com/yjxiong/temporal-segment-networks/wiki/Working-on-custom-datasets.
 [tsn-pytorch]:http://github.com/yjxiong/tsn-pytorch
+[kinetics-action]:http://yjxiong.me/others/kinetics_action/
