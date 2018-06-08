@@ -1,0 +1,256 @@
+diff --git a/cmake/FindCUDA.cmake b/cmake/FindCUDA.cmake
+index 963fcde..87e8923 100644
+--- a/cmake/FindCUDA.cmake
++++ b/cmake/FindCUDA.cmake
+@@ -519,10 +519,17 @@ macro(cuda_unset_include_and_libraries)
+   unset(CUDA_cufftemu_LIBRARY CACHE)
+   unset(CUDA_curand_LIBRARY CACHE)
+   unset(CUDA_cusparse_LIBRARY CACHE)
+-  unset(CUDA_npp_LIBRARY CACHE)
+-  unset(CUDA_nppc_LIBRARY CACHE)
+-  unset(CUDA_nppi_LIBRARY CACHE)
+   unset(CUDA_npps_LIBRARY CACHE)
++  unset(CUDA_nppial_LIBRARY CACHE)
++  unset(CUDA_nppicc_LIBRARY CACHE)
++  unset(CUDA_nppicom_LIBRARY CACHE)
++  unset(CUDA_nppidei_LIBRARY CACHE)
++  unset(CUDA_nppif_LIBRARY CACHE)
++  unset(CUDA_nppig_LIBRARY CACHE)
++  unset(CUDA_nppim_LIBRARY CACHE)
++  unset(CUDA_nppist_LIBRARY CACHE)
++  unset(CUDA_nppisu_LIBRARY CACHE)
++  unset(CUDA_nppitc_LIBRARY CACHE)
+   unset(CUDA_nvcuvenc_LIBRARY CACHE)
+   unset(CUDA_nvcuvid_LIBRARY CACHE)
+ endmacro()
+@@ -784,7 +791,22 @@ if(NOT CUDA_VERSION VERSION_LESS "3.2")
+     find_cuda_helper_libs(nvcuvid)
+   endif()
+ endif()
+-if(CUDA_VERSION VERSION_GREATER "5.0")
++if(CUDA_VERSION VERSION_GREATER "7.5")
++  # In CUDA 8.0 NPP was splitted onto 12 separate libraries.
++  find_cuda_helper_libs(nppc)
++  find_cuda_helper_libs(nppial)
++  find_cuda_helper_libs(nppicc)
++  find_cuda_helper_libs(nppicom)
++  find_cuda_helper_libs(nppidei)
++  find_cuda_helper_libs(nppif)
++  find_cuda_helper_libs(nppig)
++  find_cuda_helper_libs(nppim)
++  find_cuda_helper_libs(nppist)
++  find_cuda_helper_libs(nppisu)
++  find_cuda_helper_libs(nppitc)
++  find_cuda_helper_libs(npps)
++  set(CUDA_npp_LIBRARY "${CUDA_nppc_LIBRARY};${CUDA_nppial_LIBRARY};${CUDA_nppicc_LIBRARY};${CUDA_nppicom_LIBRARY};${CUDA_nppidei_LIBRARY};${CUDA_nppif_LIBRARY};${CUDA_nppig_LIBRARY};${CUDA_nppim_LIBRARY};${CUDA_nppist_LIBRARY};${CUDA_nppisu_LIBRARY};${CUDA_nppitc_LIBRARY};${CUDA_npps_LIBRARY}")
++elseif(CUDA_VERSION VERSION_GREATER "5.0")
+   # In CUDA 5.5 NPP was splitted onto 3 separate libraries.
+   find_cuda_helper_libs(nppc)
+   find_cuda_helper_libs(nppi)
+diff --git a/cmake/OpenCVDetectCUDA.cmake b/cmake/OpenCVDetectCUDA.cmake
+index 30b5093..c422109 100644
+--- a/cmake/OpenCVDetectCUDA.cmake
++++ b/cmake/OpenCVDetectCUDA.cmake
+@@ -1,8 +1,3 @@
+-if(${CMAKE_VERSION} VERSION_LESS "2.8.3")
+-  message(STATUS "WITH_CUDA flag requires CMake 2.8.3 or newer. CUDA support is disabled.")
+-  return()
+-endif()
+-
+ if(WIN32 AND NOT MSVC)
+   message(STATUS "CUDA compilation is disabled (due to only Visual Studio compiler supported on your platform).")
+   return()
+@@ -15,10 +10,10 @@ endif()
+ 
+ set(CMAKE_MODULE_PATH "${OpenCV_SOURCE_DIR}/cmake" ${CMAKE_MODULE_PATH})
+ 
+-if(ANDROID AND "${CUDA_VERSION}" VERSION_LESS "7.0")
++if(ANDROID)
+   set(CUDA_TARGET_OS_VARIANT "Android")
+ endif()
+-find_host_package(CUDA 4.2 QUIET)
++find_host_package(CUDA "${MIN_VER_CUDA}" QUIET)
+ 
+ list(REMOVE_AT CMAKE_MODULE_PATH 0)
+ 
+@@ -35,15 +30,12 @@ if(CUDA_FOUND)
+ 
+   if(WITH_NVCUVID)
+     find_cuda_helper_libs(nvcuvid)
+-
+     if(WIN32)
+       find_cuda_helper_libs(nvcuvenc)
+     endif()
+-
+     if(CUDA_nvcuvid_LIBRARY)
+       set(HAVE_NVCUVID 1)
+     endif()
+-
+     if(CUDA_nvcuvenc_LIBRARY)
+       set(HAVE_NVCUVENC 1)
+     endif()
+@@ -51,7 +43,7 @@ if(CUDA_FOUND)
+ 
+   message(STATUS "CUDA detected: " ${CUDA_VERSION})
+ 
+-  set(_generations "Fermi" "Kepler")
++  set(_generations "Fermi" "Kepler" "Maxwell" "Pascal" "Volta")
+   if(NOT CMAKE_CROSSCOMPILING)
+     list(APPEND _generations "Auto")
+   endif()
+@@ -71,15 +63,17 @@ if(CUDA_FOUND)
+ 
+   set(__cuda_arch_ptx "")
+   if(CUDA_GENERATION STREQUAL "Fermi")
+-    set(__cuda_arch_bin "2.0 2.1(2.0)")
++    set(__cuda_arch_bin "2.0")
+   elseif(CUDA_GENERATION STREQUAL "Kepler")
+-    if(${CUDA_VERSION} VERSION_LESS "5.0")
+-      set(__cuda_arch_bin "3.0")
+-    else()
+-      set(__cuda_arch_bin "3.0 3.5")
+-    endif()
++    set(__cuda_arch_bin "3.0 3.5 3.7")
++  elseif(CUDA_GENERATION STREQUAL "Maxwell")
++    set(__cuda_arch_bin "5.0 5.2")
++  elseif(CUDA_GENERATION STREQUAL "Pascal")
++    set(__cuda_arch_bin "6.0 6.1")
++  elseif(CUDA_GENERATION STREQUAL "Volta")
++    set(__cuda_arch_bin "7.0")
+   elseif(CUDA_GENERATION STREQUAL "Auto")
+-    execute_process( COMMAND "${CUDA_NVCC_EXECUTABLE}" "${OpenCV_SOURCE_DIR}/cmake/checks/OpenCVDetectCudaArch.cu" "--run"
++    execute_process( COMMAND "${CUDA_NVCC_EXECUTABLE}" ${CUDA_NVCC_FLAGS} "${OpenCV_SOURCE_DIR}/cmake/checks/OpenCVDetectCudaArch.cu" "--run"
+                      WORKING_DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/"
+                      RESULT_VARIABLE _nvcc_res OUTPUT_VARIABLE _nvcc_out
+                      ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
+@@ -92,23 +86,28 @@ if(CUDA_FOUND)
+   endif()
+ 
+   if(NOT DEFINED __cuda_arch_bin)
+-    if(ANDROID)
+-      if (ARM)
+-        set(__cuda_arch_bin "3.2")
+-        set(__cuda_arch_ptx "")
+-      elseif(AARCH64)
+-        set(__cuda_arch_bin "5.3")
+-        set(__cuda_arch_ptx "")
++    if(ARM)
++      set(__cuda_arch_bin "3.2")
++      set(__cuda_arch_ptx "")
++    elseif(AARCH64)
++      execute_process( COMMAND "${CUDA_NVCC_EXECUTABLE}" ${CUDA_NVCC_FLAGS} "${OpenCV_SOURCE_DIR}/cmake/checks/OpenCVDetectCudaArch.cu" "--run"
++                       WORKING_DIRECTORY "${CMAKE_BINARY_DIR}${CMAKE_FILES_DIRECTORY}/CMakeTmp/"
++                       RESULT_VARIABLE _nvcc_res OUTPUT_VARIABLE _nvcc_out
++                       ERROR_QUIET OUTPUT_STRIP_TRAILING_WHITESPACE)
++      if(NOT _nvcc_res EQUAL 0)
++        message(STATUS "Automatic detection of CUDA generation failed. Going to build for all known architectures.")
++        set(__cuda_arch_bin "5.3 6.2 7.0")
++      else()
++        set(__cuda_arch_bin "${_nvcc_out}")
++        string(REPLACE "2.1" "2.1(2.0)" __cuda_arch_bin "${__cuda_arch_bin}")
+       endif()
++      set(__cuda_arch_ptx "")
+     else()
+-      if(${CUDA_VERSION} VERSION_LESS "5.0")
+-        set(__cuda_arch_bin "1.1 1.2 1.3 2.0 2.1(2.0) 3.0")
+-      elseif(${CUDA_VERSION} VERSION_GREATER "6.5")
+-        set(__cuda_arch_bin "2.0 2.1(2.0) 3.0 3.5")
++      if(${CUDA_VERSION} VERSION_LESS "9.0")
++        set(__cuda_arch_bin "2.0 3.0 3.5 3.7 5.0 5.2 6.0 6.1")
+       else()
+-        set(__cuda_arch_bin "1.1 1.2 1.3 2.0 2.1(2.0) 3.0 3.5")
++        set(__cuda_arch_bin "3.0 3.5 3.7 5.0 5.2 6.0 6.1 7.0")
+       endif()
+-      set(__cuda_arch_ptx "3.0")
+     endif()
+   endif()
+ 
+@@ -148,6 +147,7 @@ if(CUDA_FOUND)
+       set(OPENCV_CUDA_ARCH_FEATURES "${OPENCV_CUDA_ARCH_FEATURES} ${ARCH}")
+     endif()
+   endforeach()
++  set(NVCC_FLAGS_EXTRA ${NVCC_FLAGS_EXTRA} -D_FORCE_INLINES)
+ 
+   # Tell NVCC to add PTX intermediate code for the specified architectures
+   string(REGEX MATCHALL "[0-9]+" ARCH_LIST "${ARCH_PTX_NO_POINTS}")
+@@ -175,7 +175,7 @@ if(CUDA_FOUND)
+ 
+   mark_as_advanced(CUDA_BUILD_CUBIN CUDA_BUILD_EMULATION CUDA_VERBOSE_BUILD CUDA_SDK_ROOT_DIR)
+ 
+-  macro(ocv_cuda_compile VAR)
++  macro(ocv_cuda_filter_options)
+     foreach(var CMAKE_CXX_FLAGS CMAKE_CXX_FLAGS_RELEASE CMAKE_CXX_FLAGS_DEBUG)
+       set(${var}_backup_in_cuda_compile_ "${${var}}")
+ 
+@@ -198,7 +198,13 @@ if(CUDA_FOUND)
+       # we remove -frtti because it's used for C++ compiler
+       # but NVCC uses C compiler by default
+       string(REPLACE "-frtti" "" ${var} "${${var}}")
++
++      string(REPLACE "-fvisibility-inlines-hidden" "" ${var} "${${var}}")
+     endforeach()
++  endmacro()
++
++  macro(ocv_cuda_compile VAR)
++    ocv_cuda_filter_options()
+ 
+     if(BUILD_SHARED_LIBS)
+       set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xcompiler -DCVAPI_EXPORTS)
+@@ -211,6 +217,10 @@ if(CUDA_FOUND)
+       set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xcompiler -fno-finite-math-only)
+     endif()
+ 
++    if(CMAKE_CROSSCOMPILING AND (ARM OR AARCH64))
++      set(CUDA_NVCC_FLAGS ${CUDA_NVCC_FLAGS} -Xlinker --unresolved-symbols=ignore-in-shared-libs)
++    endif()
++
+     # disabled because of multiple warnings during building nvcc auto generated files
+     if(CMAKE_COMPILER_IS_GNUCXX AND CMAKE_CXX_COMPILER_VERSION VERSION_GREATER "4.6.0")
+       ocv_warnings_disable(CMAKE_CXX_FLAGS -Wunused-but-set-variable)
+@@ -229,18 +239,40 @@ else()
+ endif()
+ 
+ if(HAVE_CUDA)
++  set(CUDA_LIBS_PATH "")
++  foreach(p ${CUDA_LIBRARIES} ${CUDA_npp_LIBRARY})
++    get_filename_component(_tmp ${p} PATH)
++    list(APPEND CUDA_LIBS_PATH ${_tmp})
++  endforeach()
++
++  if(HAVE_CUBLAS)
++    foreach(p ${CUDA_cublas_LIBRARY})
++      get_filename_component(_tmp ${p} PATH)
++      list(APPEND CUDA_LIBS_PATH ${_tmp})
++    endforeach()
++  endif()
++
++  if(HAVE_CUFFT)
++    foreach(p ${CUDA_cufft_LIBRARY})
++      get_filename_component(_tmp ${p} PATH)
++      list(APPEND CUDA_LIBS_PATH ${_tmp})
++    endforeach()
++  endif()
++
++  list(REMOVE_DUPLICATES CUDA_LIBS_PATH)
++  link_directories(${CUDA_LIBS_PATH})
++
+   set(CUDA_LIBRARIES_ABS ${CUDA_LIBRARIES})
+-  ocv_create_imported_targets(CUDA_LIBRARIES ${CUDA_LIBRARIES})
++  ocv_convert_to_lib_name(CUDA_LIBRARIES ${CUDA_LIBRARIES})
+   set(CUDA_npp_LIBRARY_ABS ${CUDA_npp_LIBRARY})
+-  ocv_create_imported_targets(CUDA_npp_LIBRARY ${CUDA_npp_LIBRARY})
+-
++  ocv_convert_to_lib_name(CUDA_npp_LIBRARY ${CUDA_npp_LIBRARY})
+   if(HAVE_CUBLAS)
+     set(CUDA_cublas_LIBRARY_ABS ${CUDA_cublas_LIBRARY})
+-    ocv_create_imported_targets(CUDA_cublas_LIBRARY ${CUDA_cublas_LIBRARY})
++    ocv_convert_to_lib_name(CUDA_cublas_LIBRARY ${CUDA_cublas_LIBRARY})
+   endif()
+ 
+   if(HAVE_CUFFT)
+     set(CUDA_cufft_LIBRARY_ABS ${CUDA_cufft_LIBRARY})
+-    ocv_create_imported_targets(CUDA_cufft_LIBRARY ${CUDA_cufft_LIBRARY})
++    ocv_convert_to_lib_name(CUDA_cufft_LIBRARY ${CUDA_cufft_LIBRARY})
+   endif()
+ endif()
+
