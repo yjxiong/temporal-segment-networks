@@ -21,7 +21,7 @@ git apply ../../opencv_cuda9.patch
 [[ -d build ]] || mkdir build
 cd build
 cmake -D CMAKE_BUILD_TYPE=RELEASE -D WITH_TBB=ON  -D WITH_V4L=ON  -D WITH_CUDA=ON -D WITH_OPENCL=OFF ..
-if make -j32 ; then
+if make  ; then
     cp lib/cv2.so ../../../
     echo "OpenCV" $version "built."
 else
