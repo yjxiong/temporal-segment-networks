@@ -11,6 +11,8 @@ Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Va
 
 ## News & Updates
 
+Jul. 20, 2017 - For those having trouble building the TSN toolkit, we have provided a built docker image you can use. Download it from https://hub.docker.com/r/bitxiong/tsn/. It contains OpenCV, Caffe, DenseFlow, and this codebase. All built and ready to use with **[NVIDIA-Docker](https://github.com/NVIDIA/nvidia-docker)**
+
 Sep. 8, 2017 - We released TSN models trained on the Kinetics dataset with 76.6% single model top-1 accuracy. Find the model weights and transfer learning experiment results on the [website][kinetics-action].
 
 Aug 10, 2017 - An experimental pytorch implementation of TSN is released [github][tsn-pytorch]
