@@ -1,0 +1,4 @@
+Can you explain how to deal with optical flow?
+I used cross-modality pre-train method and then pass stacked optical flow.
+Then output with simple LSTM model.
+Is it right method?
