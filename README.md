@@ -1,8 +1,14 @@
 # Temporal Segment Networks (TSN)
 
-This repository holds the codes and models for the paper
+This repository holds the codes and models for the papers
  
 > 
+**Temporal Segment Networks for Action Recognition in Videos**,
+Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool, *TPAMI*, 2018.
+>
+[[Arxiv Preprint](https://arxiv.org/abs/1705.02953)]
+
+>
 **Temporal Segment Networks: Towards Good Practices for Deep Action Recognition**,
 Limin Wang, Yuanjun Xiong, Zhe Wang, Yu Qiao, Dahua Lin, Xiaoou Tang, and Luc Van Gool,
 *ECCV 2016*, Amsterdam, Netherlands.
