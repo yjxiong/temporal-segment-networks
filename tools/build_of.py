@@ -81,6 +81,9 @@ def run_warp_optical_flow(vid_item, dev_id=0):
     sys.stdout.flush()
     return True
 
+def nonintersection(lst1, lst2): 
+    lst3 = [value for value in lst1 if ((value.split("/")[-1]).split(".")[0]) not in lst2] 
+    return lst3
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description="extract optical flows")
@@ -107,13 +110,17 @@ if __name__ == '__main__':
     ext = args.ext
     new_size = (args.new_width, args.new_height)
     NUM_GPU = args.num_gpu
-
     if not os.path.isdir(out_path):
         print "creating folder: "+out_path
         os.makedirs(out_path)
-
-    vid_list = glob.glob(src_path+'/*/*.'+ext)
+    print src_path
+    print ext
+    vid_list = glob.glob(src_path+'/*.'+ext)
     print len(vid_list)
+    print vid_list[1]
+    com_vid_list = os.listdir(out_path)
+    vid_list = nonintersection(vid_list, com_vid_list)
+    print "Resuming from: ", vid_list[0] 
     pool = Pool(num_worker)
     if flow_type == 'tvl1':
         pool.map(run_optical_flow, zip(vid_list, xrange(len(vid_list))))
