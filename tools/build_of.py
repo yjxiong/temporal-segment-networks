@@ -98,6 +98,7 @@ if __name__ == '__main__':
     parser.add_argument("--new_width", type=int, default=0, help='resize image width')
     parser.add_argument("--new_height", type=int, default=0, help='resize image height')
     parser.add_argument("--num_gpu", type=int, default=8, help='number of GPU')
+    parser.add_argument("--resume", type=str, default='no', choices=['yes','no'], help='resume optical flow extraction instead of overwriting')
 
     args = parser.parse_args()
 
@@ -110,17 +111,18 @@ if __name__ == '__main__':
     ext = args.ext
     new_size = (args.new_width, args.new_height)
     NUM_GPU = args.num_gpu
+    resume = args.resume
     if not os.path.isdir(out_path):
         print "creating folder: "+out_path
         os.makedirs(out_path)
-    print src_path
-    print ext
+    print "reading videos from folder: ", src_path
+    print "selected extension of videos:", ext
     vid_list = glob.glob(src_path+'/*.'+ext)
-    print len(vid_list)
-    print vid_list[1]
-    com_vid_list = os.listdir(out_path)
-    vid_list = nonintersection(vid_list, com_vid_list)
-    print "Resuming from: ", vid_list[0] 
+    print "total number of videos found: ", len(vid_list)
+    if(resume == 'yes'):
+        com_vid_list = os.listdir(out_path)
+        vid_list = nonintersection(vid_list, com_vid_list)
+        print "resuming from video: ", vid_list[0] 
     pool = Pool(num_worker)
     if flow_type == 'tvl1':
         pool.map(run_optical_flow, zip(vid_list, xrange(len(vid_list))))
