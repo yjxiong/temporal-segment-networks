@@ -81,8 +81,8 @@ def run_warp_optical_flow(vid_item, dev_id=0):
     sys.stdout.flush()
     return True
 
-def nonintersection(lst1, lst2): 
-    lst3 = [value for value in lst1 if ((value.split("/")[-1]).split(".")[0]) not in lst2] 
+def nonintersection(lst1, lst2):
+    lst3 = [value for value in lst1 if ((value.split("/")[-1]).split(".")[0]) not in lst2]
     return lst3
 
 if __name__ == '__main__':
