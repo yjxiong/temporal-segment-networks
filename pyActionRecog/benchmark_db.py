@@ -1,15 +1,16 @@
+from __future__ import print_function
 import glob
 import fnmatch
 import os
 import random
-from anet_db import ANetDB
+from .anet_db import ANetDB
 
 
 def parse_directory(path, rgb_prefix='img_', flow_x_prefix='flow_x_', flow_y_prefix='flow_y_'):
     """
     Parse directories holding extracted frames from standard benchmarks
     """
-    print 'parse frames under folder {}'.format(path)
+    print('parse frames under folder {}'.format(path))
     frame_folders = glob.glob(os.path.join(path, '*'))
 
     def count_files(directory, prefix_list):
@@ -33,9 +34,9 @@ def parse_directory(path, rgb_prefix='img_', flow_x_prefix='flow_x_', flow_y_pre
             raise ValueError('x and y direction have different number of flow images. video: '+f)
         flow_counts[k] = x_cnt
         if i % 200 == 0:
-            print '{} videos parsed'.format(i)
+            print('{} videos parsed'.format(i))
 
-    print 'frame folder analysis done'
+    print('frame folder analysis done')
     return dir_dict, rgb_counts, flow_counts
 
 
