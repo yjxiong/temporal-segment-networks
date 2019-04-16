@@ -1,4 +1,4 @@
-from benchmark_db import *
+from .benchmark_db import *
 
 
 split_parsers = dict()
