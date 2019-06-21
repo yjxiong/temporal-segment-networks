@@ -1,5 +1,7 @@
 # Temporal Segment Networks (TSN)
 
+*We have recently released [MMAction](https://github.com/open-mmlab/mmaction), which includes an official reimplementation of TSN and many state-of-the-art action recognition framewors for various tasks. We highly recommend you switch to it. This repo will remain suppported for Caffe users.* 
+
 This repository holds the codes and models for the papers
  
 > 
