@@ -15,7 +15,7 @@ sudo apt-get -qq install libzip-dev
 
 # install common dependencies: OpenCV
 # adpated from OpenCV.sh
-version="2.4.13"
+version="3.4.2"
 
 echo "Building OpenCV" $version
 [[ -d 3rd-party ]] || mkdir 3rd-party/
