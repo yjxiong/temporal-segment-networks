@@ -68,7 +68,7 @@ There are a few dependencies to run the code. The major libraries we use are
 
 The codebase is written in Python. We recommend the [Anaconda][anaconda] Python distribution. Matlab scripts are provided for some critical steps like video-level testing.
 
-The most straightforward method to install these libraries is to run the `build-all.sh` script.
+The most straightforward method to install these libraries is to run the `build_all.sh` script.
 
 Besides software, GPU(s) are required for optical flow extraction and model training. Our Caffe modification supports highly efficient parallel training. Just throw in as many GPUs as you like and enjoy.
 
