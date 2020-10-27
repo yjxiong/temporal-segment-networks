@@ -105,7 +105,7 @@ After download, please extract the videos from the `rar` archives.
 The following commands illustrate how to extract the videos.
 ```
 mkdir rars && mkdir videos
-unrar x hmdb51-org.rar rars/
+unrar x hmdb51_org.rar rars/
 for a in $(ls rars); do unrar x "rars/${a}" videos/; done;
 ```
 
